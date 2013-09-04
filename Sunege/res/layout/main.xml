@@ -1,0 +1,21 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/flayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    tools:context=".MainActivity" >
+    
+    <SurfaceView
+        android:id="@+id/surfaceView1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+  <EditText
+        android:id="@+id/edittext1"
+        android:layout_marginLeft="70px"
+        android:layout_marginTop="90px"
+        android:layout_width="300px"
+        android:layout_height="100px"
+        android:ems="10" />
+
+</FrameLayout>
