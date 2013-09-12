@@ -1,4 +1,4 @@
-package com.example.project2nd.framework.impl;
+package com.example.Sunege.framework.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,7 +11,7 @@ import android.content.res.AssetManager;
 import android.os.Environment;
 
 
-public class AndroidFileIO implements com.example.project2nd.framework.FileIO {
+public class AndroidFileIO implements com.example.Sunege.framework.FileIO {
 	AssetManager assets;
 	String externalStoragePath;
 

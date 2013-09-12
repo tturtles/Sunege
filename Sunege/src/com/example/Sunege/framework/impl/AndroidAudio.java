@@ -1,10 +1,10 @@
-package com.example.project2nd.framework.impl;
+package com.example.Sunege.framework.impl;
 
 import java.io.IOException;
 
-import com.example.project2nd.framework.Audio;
-import com.example.project2nd.framework.Music;
-import com.example.project2nd.framework.Sound;
+import com.example.Sunege.framework.Audio;
+import com.example.Sunege.framework.Music;
+import com.example.Sunege.framework.Sound;
 
 import android.app.Activity;
 import android.content.res.AssetFileDescriptor;

@@ -1,11 +1,11 @@
-package com.example.project2nd.framework.impl;
+package com.example.Sunege.framework.impl;
 
-import com.example.project2nd.framework.Audio;
-import com.example.project2nd.framework.FileIO;
-import com.example.project2nd.framework.Game;
-import com.example.project2nd.framework.Graphics;
-import com.example.project2nd.framework.Input;
-import com.example.project2nd.framework.Screen;
+import com.example.Sunege.framework.Audio;
+import com.example.Sunege.framework.FileIO;
+import com.example.Sunege.framework.Game;
+import com.example.Sunege.framework.Graphics;
+import com.example.Sunege.framework.Input;
+import com.example.Sunege.framework.Screen;
 
 import android.app.Activity;
 import android.content.Context;

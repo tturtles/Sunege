@@ -1,8 +1,8 @@
-package com.example.project2nd.framework.impl;
+package com.example.Sunege.framework.impl;
 
 import java.io.IOException;
 
-import com.example.project2nd.framework.Music;
+import com.example.Sunege.framework.Music;
 
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;

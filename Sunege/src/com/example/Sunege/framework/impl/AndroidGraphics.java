@@ -1,10 +1,10 @@
-package com.example.project2nd.framework.impl;
+package com.example.Sunege.framework.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.example.project2nd.framework.Graphics;
-import com.example.project2nd.framework.Pixmap;
+import com.example.Sunege.framework.Graphics;
+import com.example.Sunege.framework.Pixmap;
 
 import android.app.Activity;
 import android.app.AlertDialog;

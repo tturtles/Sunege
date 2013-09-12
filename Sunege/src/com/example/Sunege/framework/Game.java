@@ -1,4 +1,4 @@
-package com.example.project2nd.framework;
+package com.example.Sunege.framework;
 
 public interface Game {
     public Input getInput();

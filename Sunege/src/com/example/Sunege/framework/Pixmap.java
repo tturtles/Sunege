@@ -1,6 +1,6 @@
-package com.example.project2nd.framework;
+package com.example.Sunege.framework;
 
-import com.example.project2nd.framework.Graphics.PixmapFormat;
+import com.example.Sunege.framework.Graphics.PixmapFormat;
 
 public interface Pixmap {
 	

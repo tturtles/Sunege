@@ -1,7 +1,7 @@
-package com.example.project2nd.framework.impl;
+package com.example.Sunege.framework.impl;
 
-import com.example.project2nd.framework.Pixmap;
-import com.example.project2nd.framework.Graphics.PixmapFormat;
+import com.example.Sunege.framework.Pixmap;
+import com.example.Sunege.framework.Graphics.PixmapFormat;
 
 import android.graphics.Bitmap;
 

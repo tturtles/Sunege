@@ -1,7 +1,7 @@
-package com.example.project2nd.framework.impl;
+package com.example.Sunege.framework.impl;
 
 
-import com.example.project2nd.framework.Sound;
+import com.example.Sunege.framework.Sound;
 
 import android.media.SoundPool;
 

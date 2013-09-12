@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.project2nd"
+    package="com.example.Sunege"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.example.project2nd.framework.game.MainActivity"
+            android:name="com.example.Sunege.framework.game.MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:label="@string/app_name" 
             >

@@ -1,7 +1,7 @@
-package com.example.project2nd.framework.game;
+package com.example.Sunege.framework.game;
 
-import com.example.project2nd.framework.Screen;
-import com.example.project2nd.framework.impl.AndroidGame;
+import com.example.Sunege.framework.impl.AndroidGame;
+import com.example.Sunege.framework.Screen;
 
 public class MainActivity extends AndroidGame {
 

@@ -1,4 +1,4 @@
-package com.example.project2nd.framework.impl;
+package com.example.Sunege.framework.impl;
 
 import android.content.Context;
 import android.hardware.Sensor;
