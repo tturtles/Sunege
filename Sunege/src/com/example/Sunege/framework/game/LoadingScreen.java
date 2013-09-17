@@ -14,7 +14,8 @@ public class LoadingScreen extends Screen {
 	@Override
 	public void update(float deltaTime) {
 		Graphics g = game.getGraphics();
-//		game.setScreen(new StartScreen(game));
+		Assets.image_ke = g.newPixmap("ke.png", PixmapFormat.ARGB4444);
+		game.setScreen(new PlayScreen(game));
 	}
 
 	@Override
