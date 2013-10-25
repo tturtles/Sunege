@@ -15,6 +15,7 @@ public class LoadingScreen extends Screen {
 	public void update(float deltaTime) {
 		Graphics g = game.getGraphics();
 		Assets.image_ke = g.newPixmap("ke.png", PixmapFormat.ARGB4444);
+		Assets.bt_itemselect = g.newPixmap("bt_itemselect.png", PixmapFormat.ARGB4444);
 		game.setScreen(new PlayScreen(game));
 	}
 

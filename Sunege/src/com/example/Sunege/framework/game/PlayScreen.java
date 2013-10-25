@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import com.example.Sunege.framework.Game;
@@ -16,43 +17,49 @@ import com.example.Sunege.framework.Input.TouchEvent;
 public class PlayScreen extends Screen {
 
 	enum GameState {
-		Ready, Running, Paused, GameOver
+		ItemSelecting, Playing, Paused, GameOver
 	}
-	GameState state = GameState.Running;
-	
+
+	GameState state = GameState.Playing;
+
 	private World world;
+	private Sickhydro sick;
+	private int x;
+	private int count_shaved = 0;
 
 	public PlayScreen(Game game) {
 		super(game);
 		world = new World();
+		sick = new Sickhydro();
+		x = 0;
 	}
 
 	@Override
 	public void update(float deltaTime) {
 		List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
 		game.getInput().getKeyEvents();
-		if (state == GameState.Ready)
-			updateReady(touchEvents, deltaTime);
-		if (state == GameState.Running)
-			updateRunning(touchEvents, deltaTime);
+		if (state == GameState.ItemSelecting)
+			updateItemSelect(touchEvents, deltaTime);
+		if (state == GameState.Playing)
+			updatePlaying(touchEvents, deltaTime);
 		if (state == GameState.GameOver) {
 			updateGameOver(touchEvents);
 		}
 	}
 
-	private void updateReady(List<TouchEvent> touchEvents, float deltaTime) {
-		// ゲーム準備時のタッチ処理書き込み
+	private void updateItemSelect(List<TouchEvent> touchEvents, float deltaTime) {
+		// ItemSelectScreenのタッチ処理書き込み
 		int len = touchEvents.size();
 		for (int i = 0; i < len; i++) {
 			TouchEvent event = touchEvents.get(i);
 			switch (event.type) {
-			case MotionEvent.ACTION_UP:
-				state = GameState.Running;
+			case MotionEvent.ACTION_DOWN:
+				state = GameState.Playing;
 			}
 		}
 	}
 
-	private void updateRunning(List<TouchEvent> touchEvents, float deltaTime) {
+	private void updatePlaying(List<TouchEvent> touchEvents, float deltaTime) {
 		// ゲーム中のタッチ処理書き込み
 		int len = touchEvents.size();
 		for (int i = 0; i < len; i++) {
@@ -60,7 +67,16 @@ public class PlayScreen extends Screen {
 			switch (event.type) {
 			case MotionEvent.ACTION_MOVE:
 			case MotionEvent.ACTION_DOWN:
+				if(isBounds(event, 0, 0, 200, 100)) {
+					state = GameState.ItemSelecting;
+				} else {
+					sick.setFlag(true);
+					sick.setXY(event.x, event.y);
+				}
+				break;
 			case MotionEvent.ACTION_UP:
+				sick.setFlag(false);
+				break;
 			}
 		}
 		world.update(deltaTime);
@@ -79,30 +95,53 @@ public class PlayScreen extends Screen {
 
 	@Override
 	public void present(float deltaTime) {
-		if (state == GameState.Ready)
-			drawReadyUI();
-		if (state == GameState.Running)
-			drawRunningUI();
+		if (state == GameState.ItemSelecting)
+			drawItemSelectUI();
+		if (state == GameState.Playing)
+			drawPlayingUI();
 		if (state == GameState.GameOver)
 			drawGameOverUI();
 	}
 
-	private void drawReadyUI() {
-		// ゲーム準備時のUI(描画系)
+	private void drawItemSelectUI() {
+		// ItemSelect時のUI(描画系)
 		Graphics g = game.getGraphics();
 		Paint paint = new Paint();
 		paint.setColor(Color.RED);
 		paint.setTextSize(100);
 		g.drawRect(0, 0, 481, 801, Color.BLACK);
-		g.drawTextAlp("Ready?", 70, 300, paint);
+		g.drawTextAlp("ItemSelectScreen", 70, 300, paint);
 		paint.setTextSize(30);
-		g.drawTextAlp("Tap on Start", 150, 500, paint);
+		g.drawTextAlp("未実装段階", 150, 500, paint);
 	}
 
-	private void drawRunningUI() {
+	private void drawPlayingUI() {
 		// ゲーム中のUI(描画系)
 		Graphics g = game.getGraphics();
 		g.drawRect(0, 0, 481, 801, Color.rgb(255, 241, 207));
+		world.draw(g);
+		sick.draw(g);
+		if (x > 480)
+			x = 0;
+		else
+			x++;
+
+		g.drawLine(0, 3, x, 3, Color.BLUE, 5); // 描画されているか確認用
+		LinkedList sprites = world.getSprites();
+		Iterator iterator = sprites.iterator(); // Iterator=コレクション内の要素を順番に取り出す方法
+		while (iterator.hasNext()) { // iteratorの中で次の要素がある限りtrue
+			Sprite sprite = (Sprite) iterator.next();
+			sprite.Update();
+			if (sick.isCollision(sprite)) {
+				sprites.remove(sprite);
+				count_shaved++;
+				break;
+			}
+			sprite.draw(g);
+		}
+		g.drawPixmap(Assets.bt_itemselect, 0, 0);
+		g.drawTextAlp("剃った本数:", 210, 40, Color.BLACK, 35);
+		g.drawTextAlp(""+count_shaved, 400, 70, Color.BLACK, 50);
 	}
 
 	private void drawGameOverUI() {

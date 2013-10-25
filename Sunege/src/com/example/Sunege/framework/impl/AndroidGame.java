@@ -34,16 +34,6 @@ public abstract class AndroidGame extends Activity implements Game {
 	FileIO fileIO;
 	Screen screen;
 	WakeLock wakeLock;
-	RelativeLayout mainLayout;
-	EditText et;
-	Handler handler;
-	final int WIDTH = 300;
-	final int HEIGHT = 100;
-	final int ET_X = 100;
-	final int ET_Y = 270;
-	final int ET_BUCKCOLOR = Color.GRAY;
-	final int ET_TEXTCOLOR = Color.WHITE;
-	final int ET_TEXTSIZE = 30;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -68,24 +58,7 @@ public abstract class AndroidGame extends Activity implements Game {
 		audio = new AndroidAudio(this);
 		input = new AndroidInput(this, renderView, scaleX, scaleY);
 		screen = getStartScreen();
-
-		/* 試験的 */
-		handler = new Handler();
-		mainLayout = new RelativeLayout(this);
-		mainLayout.addView(renderView);
-		et = new EditText(this);
-		RelativeLayout.LayoutParams param = new RelativeLayout.LayoutParams(
-				WIDTH, HEIGHT);
-		param.setMargins(ET_X, ET_Y, 0, 0);
-		mainLayout.addView(et, param);
-		et.setBackgroundColor(ET_BUCKCOLOR);
-		et.setTextColor(ET_TEXTCOLOR);
-		et.setTextSize(ET_TEXTSIZE);
-		et.setInputType(InputType.TYPE_CLASS_TEXT);
-		setContentView(mainLayout);
-		/* End */
-
-		// setContentView(renderView);
+		setContentView(renderView);
 
 		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK,
@@ -142,27 +115,4 @@ public abstract class AndroidGame extends Activity implements Game {
 		return screen;
 	}
 
-	/* 9/1Wiget追加類（レイアウトいじるよう ） */
-
-	public void chengeEditText(final boolean swith) {
-		new Thread(new Runnable() {
-			public void run() {
-				handler.post(new Runnable() {
-					public void run() {
-						if (swith)
-							et.setVisibility(View.VISIBLE);
-						else
-							et.setVisibility(View.GONE);
-					}
-				});
-			}
-		}).start();
-	}
-
-	public String getEText() {
-		SpannableStringBuilder sb = (SpannableStringBuilder) et.getText();
-		return sb.toString();
-	}
-
-	/* End */
 }

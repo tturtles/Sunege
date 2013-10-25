@@ -14,8 +14,4 @@ public interface Game {
     public Screen getCurrentScreen();
 
     public Screen getStartScreen();
-    
-    public void chengeEditText(boolean swith);
-    
-    public String getEText();
 }
