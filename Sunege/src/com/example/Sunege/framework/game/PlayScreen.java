@@ -6,6 +6,7 @@ import java.util.List;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -24,14 +25,16 @@ public class PlayScreen extends Screen {
 
 	private World world;
 	private Sickhydro sick;
-	private int x;
+	private int x = 0;
 	private int count_shaved = 0;
+	private Point pos;
+	private boolean flag_s = false;
 
 	public PlayScreen(Game game) {
 		super(game);
 		world = new World();
 		sick = new Sickhydro();
-		x = 0;
+		pos = new Point();	//[0]=前の位置　[1]=次の位置
 	}
 
 	@Override
@@ -61,21 +64,37 @@ public class PlayScreen extends Screen {
 
 	private void updatePlaying(List<TouchEvent> touchEvents, float deltaTime) {
 		// ゲーム中のタッチ処理書き込み
+		int interval_y = 5;
 		int len = touchEvents.size();
 		for (int i = 0; i < len; i++) {
 			TouchEvent event = touchEvents.get(i);
 			switch (event.type) {
 			case MotionEvent.ACTION_MOVE:
+				Log.d("pos.x", ""+pos.x);
+				Log.d("event.x", ""+event.x);
+				if(interval_y<-(pos.x-event.x) || interval_y<(pos.x-event.x)) {
+					flag_s = true;
+				}
 			case MotionEvent.ACTION_DOWN:
-				if (isBounds(event, 0, 0, 200, 100)) {
-					state = GameState.ItemSelecting;
-				} else {
+				if (!isBounds(event, 440, 0, 40, 40)) {
 					sick.setFlag(true);
 					sick.setXY(event.x, event.y);
+					pos.x = event.x;
+					pos.y = event.y;
+					break;
 				}
-				break;
 			case MotionEvent.ACTION_UP:
-				sick.setFlag(false);
+				if (isBounds(event, 0, 0, 200, 100))
+					state = GameState.ItemSelecting;
+				else if (isBounds(event, 440, 0, 40, 40))
+					world.load();
+				else {
+					sick.setFlag(false);
+					sick.setXY(-sick.width, -sick.height);
+				}
+				pos.x = -1;
+				pos.y = -1;
+				flag_s = false;
 				break;
 			}
 		}
@@ -125,6 +144,9 @@ public class PlayScreen extends Screen {
 			x = 0;
 		else
 			x++;
+		if(flag_s) {
+			g.drawRect(100, 100, 100, 100, Color.BLUE);
+		}
 
 		g.drawLine(0, 3, x, 3, Color.BLUE, 5); // 描画されているか確認用
 		LinkedList sprites = world.getSprites();
@@ -135,8 +157,8 @@ public class PlayScreen extends Screen {
 			if (sick.isCollision(sprite)) {
 				if (sprite instanceof Ke) {
 					Ke ke = (Ke) sprite;
-					sprites.remove(ke);
-					count_shaved++;
+					if (sprites.remove(ke))
+						count_shaved++;
 					break;
 				}
 			}
@@ -147,7 +169,8 @@ public class PlayScreen extends Screen {
 			Sprite sprite = (Sprite) iterator.next();
 			sprite.draw(g);
 		}
-		
+
+		g.drawRect(440, 0, 40, 40, Color.RED, 150);
 		g.drawPixmap(Assets.bt_itemselect, 0, 0);
 		g.drawTextAlp("剃った本数:", 210, 40, Color.BLACK, 35);
 		g.drawTextAlp("" + count_shaved, 400, 70, Color.BLACK, 50);

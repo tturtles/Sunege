@@ -113,6 +113,14 @@ public class AndroidGraphics extends Activity implements Graphics {
 		canvas.drawRect(x, y, x + width - 1, y + height - 1, paint);
 	}
 
+	public void drawRect(int x, int y, int width, int height, int color,
+			int alpha) {
+		paint.setColor(color);
+		paint.setStyle(Style.FILL);
+		paint.setAlpha(alpha);
+		canvas.drawRect(x, y, x + width - 1, y + height - 1, paint);
+	}
+
 	public void drawPixmap(Pixmap pixmap, int x, int y, int srcX, int srcY,
 			int srcWidth, int srcHeight) {
 		srcRect.left = srcX;
@@ -197,5 +205,5 @@ public class AndroidGraphics extends Activity implements Graphics {
 		path.lineTo(x3, y3);
 		canvas.drawPath(path, paint);
 	}
-	
+
 }

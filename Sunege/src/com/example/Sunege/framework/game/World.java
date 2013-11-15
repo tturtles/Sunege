@@ -8,7 +8,7 @@ import com.example.Sunege.framework.Graphics;
 
 public class World {
 
-	private static final float TICK_INITIAL = 1.0f;
+	private static final float TICK_INITIAL = 5.0f;
 	private static float tick = TICK_INITIAL; // 更新速度
 	private float tickTime;
 	private LinkedList sprites;
@@ -20,21 +20,23 @@ public class World {
 	}
 
 	public void load() {
-		for (int i = 0; i < 100; i++) {
+		for (int i = sprites.size() - 1; sprites.size() < 100; i++) {
 			sprites.add(new Ke());
 		}
 	}
 
 	public void update(float deltaTime) {
-//		tickTime += deltaTime;
-//		while (tickTime > tick) {
-//		}
+		tickTime += deltaTime;
+		while (tickTime > tick) {
+			tickTime -= tick;
+			sprites.add(new Ke());
+		}
 	}
 
 	public void draw(Graphics g) {
 
 	}
-	
+
 	public LinkedList getSprites() {
 		return sprites;
 	}
