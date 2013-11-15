@@ -12,22 +12,16 @@ public class World {
 	private static float tick = TICK_INITIAL; // 更新速度
 	private float tickTime;
 	private LinkedList sprites;
-	private ArrayList list;
 
 	public World() {
 		tickTime = 0;
-		list = new ArrayList();
 		sprites = new LinkedList();
 		load();
 	}
 
 	public void load() {
 		for (int i = 0; i < 100; i++) {
-			list.add(new Ke());
-		}
-		
-		for (int i = 0; i < 100; i++) {
-			sprites.add(list.get(i));
+			sprites.add(new Ke());
 		}
 	}
 

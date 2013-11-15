@@ -67,7 +67,7 @@ public class PlayScreen extends Screen {
 			switch (event.type) {
 			case MotionEvent.ACTION_MOVE:
 			case MotionEvent.ACTION_DOWN:
-				if(isBounds(event, 0, 0, 200, 100)) {
+				if (isBounds(event, 0, 0, 200, 100)) {
 					state = GameState.ItemSelecting;
 				} else {
 					sick.setFlag(true);
@@ -133,15 +133,24 @@ public class PlayScreen extends Screen {
 			Sprite sprite = (Sprite) iterator.next();
 			sprite.Update();
 			if (sick.isCollision(sprite)) {
-				sprites.remove(sprite);
-				count_shaved++;
-				break;
+				if (sprite instanceof Ke) {
+					Ke ke = (Ke) sprite;
+					sprites.remove(ke);
+					count_shaved++;
+					break;
+				}
 			}
+		}
+
+		iterator = sprites.iterator();
+		while (iterator.hasNext()) {
+			Sprite sprite = (Sprite) iterator.next();
 			sprite.draw(g);
 		}
+		
 		g.drawPixmap(Assets.bt_itemselect, 0, 0);
 		g.drawTextAlp("剃った本数:", 210, 40, Color.BLACK, 35);
-		g.drawTextAlp(""+count_shaved, 400, 70, Color.BLACK, 50);
+		g.drawTextAlp("" + count_shaved, 400, 70, Color.BLACK, 50);
 	}
 
 	private void drawGameOverUI() {
