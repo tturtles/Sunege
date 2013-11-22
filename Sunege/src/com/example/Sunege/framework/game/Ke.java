@@ -12,14 +12,13 @@ public class Ke extends Sprite {
 	private static float tick = TICK_INITIAL; // 更新速度
 	private float tickTime;
 
-
 	public Ke() {
 		this.image = Assets.image_ke;
-		this.width = 30;
-		this.height = 30;
+		this.width = 25;
+		this.height = 25;
 		Random rand = new Random();
 		this.x = rand.nextInt(480 - width);
-		this.y = rand.nextInt((800-200) - height)+200;
+		this.y = rand.nextInt((800 - 245)) + 100;
 	}
 
 	@Override
@@ -28,9 +27,8 @@ public class Ke extends Sprite {
 	}
 
 	public void draw(Graphics g) {
-		g.drawPixmap(image, (int) x, (int) y - (140 - height));
+		g.drawPixmap(image, (int) x, (int) y);
 		// g.drawRect((int)x, (int)y, width, height, Color.GRAY);
 	}
-
 
 }

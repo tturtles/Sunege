@@ -7,6 +7,7 @@ import java.util.List;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.renderscript.Sampler.Value;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -33,8 +34,10 @@ public class PlayScreen extends Screen {
 	public PlayScreen(Game game) {
 		super(game);
 		world = new World();
-		sick = new Sickhydro();
-		pos = new Point();	//[0]=前の位置　[1]=次の位置
+		sick = new Sickhydro(10);
+		pos = new Point(); // [0]=前の位置　[1]=次の位置
+		String[][] list = Utils.readFile(game.getFileIO());
+		count_shaved = Integer.parseInt(list[0][0]);
 	}
 
 	@Override
@@ -56,8 +59,20 @@ public class PlayScreen extends Screen {
 		for (int i = 0; i < len; i++) {
 			TouchEvent event = touchEvents.get(i);
 			switch (event.type) {
-			case MotionEvent.ACTION_DOWN:
-				state = GameState.Playing;
+			case MotionEvent.ACTION_UP:
+				if (isBounds(event, 0, 750, 480, 800))
+					state = GameState.Playing;
+				if (isBounds(event, 0, 170, 480, 100))
+					sick = new Sickhydro(10);
+				if (isBounds(event, 0, 270, 480, 100))
+					sick = new Sickhydro(20);
+				if (isBounds(event, 0, 370, 480, 100))
+					sick = new Sickhydro(30);
+				if (isBounds(event, 0, 470, 480, 100))
+					sick = new Sickhydro(40);
+				if (isBounds(event, 0, 570, 480, 100))
+					sick = new Sickhydro(50);
+				return;
 			}
 		}
 	}
@@ -70,9 +85,12 @@ public class PlayScreen extends Screen {
 			TouchEvent event = touchEvents.get(i);
 			switch (event.type) {
 			case MotionEvent.ACTION_MOVE:
-				Log.d("pos.x", ""+pos.x);
-				Log.d("event.x", ""+event.x);
-				if(interval_y<-(pos.x-event.x) || interval_y<(pos.x-event.x)) {
+				Log.d("pos.x", "" + pos.x);
+				Log.d("event.x", "" + event.x);
+				if (interval_y < -(pos.x - event.x)
+						|| interval_y < (pos.x - event.x)) {
+					if (!flag_s)
+						Assets.voice01.play(1);
 					flag_s = true;
 				}
 			case MotionEvent.ACTION_DOWN:
@@ -99,6 +117,7 @@ public class PlayScreen extends Screen {
 			}
 		}
 		world.update(deltaTime);
+		sick.Update();
 	}
 
 	private void updateGameOver(List<TouchEvent> touchEvents) {
@@ -125,13 +144,13 @@ public class PlayScreen extends Screen {
 	private void drawItemSelectUI() {
 		// ItemSelect時のUI(描画系)
 		Graphics g = game.getGraphics();
-		Paint paint = new Paint();
-		paint.setColor(Color.RED);
-		paint.setTextSize(100);
 		g.drawRect(0, 0, 481, 801, Color.BLACK);
-		g.drawTextAlp("ItemSelectScreen", 70, 300, paint);
-		paint.setTextSize(30);
-		g.drawTextAlp("未実装段階", 150, 500, paint);
+		g.drawTextAlp("ItemSelectScreen", 50, 100, Color.RED, 50);
+		for (int i = 0; i < 5; i++) {
+			g.drawRect(0, (i * 100) + 170, 480, 100, Color.RED);
+			g.drawTextAlp("" + (i + 1), 230, (i * 100) + 230, Color.WHITE, 40);
+		}
+		g.drawRect(0, 750, 480, 800, Color.WHITE, 255);
 	}
 
 	private void drawPlayingUI() {
@@ -144,7 +163,7 @@ public class PlayScreen extends Screen {
 			x = 0;
 		else
 			x++;
-		if(flag_s) {
+		if (flag_s) {
 			g.drawRect(100, 100, 100, 100, Color.BLUE);
 		}
 
@@ -157,8 +176,11 @@ public class PlayScreen extends Screen {
 			if (sick.isCollision(sprite)) {
 				if (sprite instanceof Ke) {
 					Ke ke = (Ke) sprite;
-					if (sprites.remove(ke))
-						count_shaved++;
+					if (!sick.getFlag_end())
+						if (sprites.remove(ke)) {
+							count_shaved++;
+							sick.setHp();
+						}
 					break;
 				}
 			}
@@ -206,6 +228,7 @@ public class PlayScreen extends Screen {
 
 	@Override
 	public void dispose() {
+		Long time = System.currentTimeMillis();
+		Utils.addData(game.getFileIO(), count_shaved, 0, 1, 0, 0, 0, 0, time);
 	}
-
 }

@@ -1,7 +1,5 @@
 package com.example.Sunege.framework.game;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 
 import com.example.Sunege.framework.Graphics;
@@ -20,7 +18,7 @@ public class World {
 	}
 
 	public void load() {
-		for (int i = sprites.size() - 1; sprites.size() < 100; i++) {
+		for (; sprites.size() < 100;) {
 			sprites.add(new Ke());
 		}
 	}
