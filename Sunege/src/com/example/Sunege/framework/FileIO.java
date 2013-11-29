@@ -11,8 +11,7 @@ public interface FileIO {
 
 	public boolean writeFile(ContentValues val);
 
-	public String[][] readFile(String[] columns, String where, String[] value,
-			String older, int quantity);
-	
-	public InputStream readSound(String fileName)throws IOException;
+	public String[][] readFile(String[] columns, String where, String[] value, String older, int quantity);
+
+	public InputStream readSound(String fileName) throws IOException;
 }

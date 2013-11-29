@@ -1,5 +1,7 @@
 package com.example.Sunege.framework.game;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,7 +9,6 @@ import java.util.List;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.renderscript.Sampler.Value;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -30,6 +31,7 @@ public class PlayScreen extends Screen {
 	private int count_shaved = 0;
 	private Point pos;
 	private boolean flag_s = false;
+	private long difference;
 
 	public PlayScreen(Game game) {
 		super(game);
@@ -38,6 +40,17 @@ public class PlayScreen extends Screen {
 		pos = new Point(); // [0]=前の位置　[1]=次の位置
 		String[][] list = Utils.readFile(game.getFileIO());
 		count_shaved = Integer.parseInt(list[0][0]);
+		if (count_shaved == 0)	world.load();
+		difference = (System.currentTimeMillis()) - Long.parseLong(list[0][7]);
+		difference = difference + 100000L;
+		SimpleDateFormat D = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Log.d("TIME1", "" + D.format(new Date(System.currentTimeMillis())));
+		Log.d("TIME2", "" + D.format(new Date(Long.parseLong(list[0][7]))));
+		D = new SimpleDateFormat("HHHH:mm:ss");
+		Log.d("TIME3", "" + D.format(new Date(difference)));
+		// Log.d("SUM", ""+(difference/300000)); // 5分ごと
+		Log.d("SUM", "" + (difference / 5000)); // 5秒ごと
+		world.addSunege((int) difference / 5000);
 	}
 
 	@Override
@@ -71,7 +84,7 @@ public class PlayScreen extends Screen {
 				if (isBounds(event, 0, 470, 480, 100))
 					sick = new Sickhydro(40);
 				if (isBounds(event, 0, 570, 480, 100))
-					sick = new Sickhydro(50);
+					sick = new Sickhydro(1000);
 				return;
 			}
 		}

@@ -14,8 +14,10 @@ import com.example.Sunege.framework.FileIO;
 public class Utils {
 	public static boolean soundEnabled = true;
 	public SharedPreferences sharedPref;
+	public long old_time;
 
 	public Utils() {
+		old_time = 0;
 	}
 
 	public static void load(FileIO files) {
@@ -27,11 +29,11 @@ public class Utils {
 					+ "sick1 integer default 1," + "sick2 integer default 0,"
 					+ "sick3 integer default 0," + "sick4 integer default 0,"
 					+ "sick5 integer default 0," + "times long)";
-			if (files.CreateDBandTable(sql))
+			if (files.CreateDBandTable(sql)) 
 				addData(files, 0, 0, 1, 0, 0, 0, 0, System.currentTimeMillis());
 			in = new BufferedReader(new InputStreamReader(
 					files.readSound(".sunege")));
-			soundEnabled = Boolean.parseBoolean(in.readLine());
+//			soundEnabled = Boolean.parseBoolean(in.readLine());
 			soundEnabled = true;
 		} catch (IOException e) {
 			// デフォルト設定があるのでエラーは無視
