@@ -7,11 +7,13 @@ import java.io.OutputStream;
 import android.content.ContentValues;
 
 public interface FileIO {
-	public boolean CreateDBandTable(String sql);
+	public boolean CreateDBandTable(String[] sql);
 
-	public boolean writeFile(ContentValues val);
+	public boolean writeFile(String table, ContentValues val);
 
-	public String[][] readFile(String[] columns, String where, String[] value, String older, int quantity);
+	public String[][] readFile(String table, String[] columns, String where, String[] value, String older, int quantity);
 
 	public InputStream readSound(String fileName) throws IOException;
+	
+	public boolean deleteRecode(String table, String whereClause);
 }

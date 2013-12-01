@@ -141,6 +141,10 @@ public class AndroidGraphics extends Activity implements Graphics {
 		canvas.drawBitmap(((AndroidPixmap) pixmap).bitmap, x, y, null);
 	}
 
+	public void drawPixmap(Pixmap pixmap, Rect src, Rect dst) {
+		canvas.drawBitmap(((AndroidPixmap) pixmap).bitmap, src, dst, paint);
+	}
+
 	public int getWidth() {
 		return frameBuffer.getWidth();
 	}

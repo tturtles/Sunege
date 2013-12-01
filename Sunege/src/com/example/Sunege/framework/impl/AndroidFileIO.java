@@ -26,12 +26,14 @@ public class AndroidFileIO implements FileIO {
 				.getAbsolutePath() + File.separator;
 	}
 
-	public boolean CreateDBandTable(String sql) {
+	public boolean CreateDBandTable(String[] sql) {
 		helper = new CreateProductHelper(con);
 		db = helper.getWritableDatabase();
 		try {
-			db.execSQL(sql);
-			Log.d("テーブル作成", "成功");
+			for (int i = 0; i < sql.length; i++) {
+				db.execSQL(sql[i]);
+			Log.d("テーブル作成", "成功"+i);
+			}
 			return true;
 		} catch (Exception e) {
 			Log.d("テーブル作成", "作成済み");
@@ -40,11 +42,11 @@ public class AndroidFileIO implements FileIO {
 		}
 	}
 
-	public boolean writeFile(ContentValues val) {
+	public boolean writeFile(String table, ContentValues val) {
 		try {
 			db = helper.getWritableDatabase();
 			db.beginTransaction(); // トランザクション制御開始
-			db.insert("savedata", null, val); // データ登録
+			db.insert(table, null, val); // データ登録
 			db.setTransactionSuccessful(); // コミット
 			Log.d("データ登録", "成功");
 			return true;
@@ -58,12 +60,12 @@ public class AndroidFileIO implements FileIO {
 		}
 	}
 
-	public String[][] readFile(String[] columns, String where, String[] value,
+	public String[][] readFile(String table, String[] columns, String where, String[] value,
 			String older, int quantity) {
 		String[][] list = new String[quantity][columns.length];
 		try {
 			db = helper.getReadableDatabase();
-			Cursor cursor = db.query("savedata", columns, where, value, null,
+			Cursor cursor = db.query(table,  columns, where, value, null,
 					null, older);
 			for (int i = 0; i < quantity && cursor.moveToNext(); i++)
 				for (int j = 0; j < columns.length; j++)
@@ -75,9 +77,27 @@ public class AndroidFileIO implements FileIO {
 		} finally {
 			db.close();
 		}
-			return list;
+		return list;
 	}
-	
+
+	public boolean deleteRecode(String table, String whereClause) {
+		try {
+			db = helper.getWritableDatabase();
+			db.beginTransaction(); // トランザクション制御開始
+			db.delete(table, whereClause, null); // データ登録
+			db.setTransactionSuccessful(); // コミット
+			Log.d("データ削除", "成功");
+			return true;
+		} catch (Exception e) {
+			Log.d("データ削除", "失敗");
+			Log.d("error", e.toString());
+			return false;
+		} finally {
+			db.endTransaction(); // トランザクション制御終了
+			db.close();
+		}
+	}
+
 	public InputStream readSound(String fileName) throws IOException {
 		return new FileInputStream(externalStoragePath + fileName);
 	}

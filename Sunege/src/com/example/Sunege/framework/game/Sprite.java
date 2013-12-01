@@ -17,10 +17,9 @@ public abstract class Sprite {
 	private static int LOOP_COUNT = 30;
 	private int count = LOOP_COUNT;
 
-	public Sprite() {
-	}
-
-	public abstract void Update();
+	public void Update(){};
+	
+	public void Update(float deltaTime){};
 
 	public void draw(Graphics g) {
 		g.drawPixmap(this.image, (int) x, (int) y);

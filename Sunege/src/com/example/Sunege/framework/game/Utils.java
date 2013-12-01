@@ -23,22 +23,25 @@ public class Utils {
 	public static void load(FileIO files) {
 		BufferedReader in = null;
 		try {
-			String sql = "create table savedata("
+			String[] sql = new String[2];
+			sql[0] = "create table SaveData("
 					+ "_id integer primary key autoincrement,"
 					+ "sum integer default 0," + "loves integer default 0,"
 					+ "sick1 integer default 1," + "sick2 integer default 0,"
 					+ "sick3 integer default 0," + "sick4 integer default 0,"
 					+ "sick5 integer default 0," + "times long)";
-			if (files.CreateDBandTable(sql)) 
-				addData(files, 0, 0, 1, 0, 0, 0, 0, System.currentTimeMillis());
-			in = new BufferedReader(new InputStreamReader(
-					files.readSound(".sunege")));
-//			soundEnabled = Boolean.parseBoolean(in.readLine());
-			soundEnabled = true;
-		} catch (IOException e) {
+
+			sql[1] = "create table SunegeData("
+					+ "_id integer primary key autoincrement,"
+					+ "x integer default 0," + "y integer default 0,"
+					+ "level integer default 10," + "type text default A,"
+					+ "times long)";
+
+			if (files.CreateDBandTable(sql))
+				addSaveData(files, 0, 0, 1, 0, 0, 0, 0,
+						System.currentTimeMillis());
+		} catch (Exception e) {
 			// デフォルト設定があるのでエラーは無視
-		} catch (NumberFormatException e) {
-			// 同上
 		} finally {
 			try {
 				if (in != null)
@@ -48,8 +51,8 @@ public class Utils {
 		}
 	}
 
-	public static boolean addData(FileIO files, int sum, int loves, int sick1,
-			int sick2, int sick3, int sick4, int sick5, long times) {
+	public static boolean addSaveData(FileIO files, int sum, int loves,
+			int sick1, int sick2, int sick3, int sick4, int sick5, long times) {
 		ContentValues val = new ContentValues();
 		val.put("sum", sum);
 		val.put("loves", loves);
@@ -59,15 +62,36 @@ public class Utils {
 		val.put("sick4", sick4);
 		val.put("sick5", sick5);
 		val.put("times", times);
-		return files.writeFile(val);
+		return files.writeFile("SaveData", val);
 	}
 
-	public static String[][] readFile(FileIO files) {
+	public static boolean addSunegeData(FileIO files, int x, int y, int level,
+			String type, long times) {
+		ContentValues val = new ContentValues();
+		val.put("x", x);
+		val.put("y", y);
+		val.put("level", level);
+		val.put("type", type);
+		val.put("times", times);
+		return files.writeFile("SunegeData", val);
+	}
+
+	public static String[][] readSaveData(FileIO files) {
 		String[] columns = { "sum", "loves", "sick1", "sick2", "sick3",
 				"sick4", "sick5", "times" };
 		String order = "times desc";
 		// String order = null;
-		return files.readFile(columns, null, null, order, 1);
+		return files.readFile("SaveData",columns, null, null, order, 1);
+	}
+
+	public static String[][] readSunegeData(FileIO files) {
+		String[] columns = { "x", "y", "level", "type", "times" };
+		// String order = null;
+		return files.readFile("SunegeData", columns, null, null, null, 110);
+	}
+
+	public static boolean deleteSunegeRecode(FileIO files) {
+		return files.deleteRecode("SunegeData", null);
 	}
 
 }

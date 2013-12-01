@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import android.app.UiModeManager;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -31,26 +32,28 @@ public class PlayScreen extends Screen {
 	private int count_shaved = 0;
 	private Point pos;
 	private boolean flag_s = false;
-	private long difference;
 
 	public PlayScreen(Game game) {
 		super(game);
+		long difference;
 		world = new World();
-		sick = new Sickhydro(10);
+		sick = new Sickhydro(999);
 		pos = new Point(); // [0]=前の位置　[1]=次の位置
-		String[][] list = Utils.readFile(game.getFileIO());
+		String[][] list = Utils.readSaveData(game.getFileIO());
 		count_shaved = Integer.parseInt(list[0][0]);
-		if (count_shaved == 0)	world.load();
+		if (count_shaved == 0)
+			world.load();
+		else
+			world.load(Utils.readSunegeData(game.getFileIO()));
 		difference = (System.currentTimeMillis()) - Long.parseLong(list[0][7]);
-		difference = difference + 100000L;
+		difference = difference + 1000L;
 		SimpleDateFormat D = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Log.d("TIME1", "" + D.format(new Date(System.currentTimeMillis())));
 		Log.d("TIME2", "" + D.format(new Date(Long.parseLong(list[0][7]))));
 		D = new SimpleDateFormat("HHHH:mm:ss");
 		Log.d("TIME3", "" + D.format(new Date(difference)));
-		// Log.d("SUM", ""+(difference/300000)); // 5分ごと
-		Log.d("SUM", "" + (difference / 5000)); // 5秒ごと
-		world.addSunege((int) difference / 5000);
+		Log.d("追加するすね毛の本数", "" + (difference / 60000)); // 60秒ごと
+		world.addSunege((int) difference / 60000);
 	}
 
 	@Override
@@ -98,8 +101,6 @@ public class PlayScreen extends Screen {
 			TouchEvent event = touchEvents.get(i);
 			switch (event.type) {
 			case MotionEvent.ACTION_MOVE:
-				Log.d("pos.x", "" + pos.x);
-				Log.d("event.x", "" + event.x);
 				if (interval_y < -(pos.x - event.x)
 						|| interval_y < (pos.x - event.x)) {
 					if (!flag_s)
@@ -130,6 +131,16 @@ public class PlayScreen extends Screen {
 			}
 		}
 		world.update(deltaTime);
+		// 毛の更新
+		LinkedList sprites = world.getSprites();
+		Iterator iterator = sprites.iterator();
+		while (iterator.hasNext()) {
+			Sprite sprite = (Sprite) iterator.next();
+			if (sprite instanceof Ke) {
+				Ke ke = (Ke) sprite;
+				ke.Update(deltaTime);
+			}
+		}
 		sick.Update();
 	}
 
@@ -242,6 +253,22 @@ public class PlayScreen extends Screen {
 	@Override
 	public void dispose() {
 		Long time = System.currentTimeMillis();
-		Utils.addData(game.getFileIO(), count_shaved, 0, 1, 0, 0, 0, 0, time);
+		Utils.addSaveData(game.getFileIO(), count_shaved, 0, 1, 0, 0, 0, 0,
+				time);
+		LinkedList sprites = world.getSprites();
+		Iterator iterator = sprites.iterator();
+		int i = 0;
+		if (Utils.deleteSunegeRecode(game.getFileIO())) {
+			// // 毛の更新
+			while (iterator.hasNext()) {
+				i++;
+				Sprite sprite = (Sprite) iterator.next();
+				if (sprite instanceof Ke) {
+					Ke ke = (Ke) sprite;
+					Utils.addSunegeData(game.getFileIO(), (int) ke.x,
+							(int) ke.y, ke.level, ke.type, time);
+				}
+			}
+		}
 	}
 }

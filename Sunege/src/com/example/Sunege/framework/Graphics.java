@@ -2,6 +2,7 @@ package com.example.Sunege.framework;
 
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.widget.FrameLayout;
 
 public interface Graphics {
@@ -23,10 +24,12 @@ public interface Graphics {
     
     public void drawRect(int x, int y, int width, int height, int color, int alpha);
 
-    public void drawPixmap(Pixmap pixmap, int x, int y, int srcX, int srcY,
-            int srcWidth, int srcHeight);
-
     public void drawPixmap(Pixmap pixmap, int x, int y);
+
+    public void drawPixmap(Pixmap pixmap, int x, int y, int srcX, int srcY,
+    		int srcWidth, int srcHeight);
+    
+    public void drawPixmap(Pixmap pixmap, Rect src, Rect dst);
     
     public void drawController(int cx, int cy, int cr, Paint circle_paint, int color, int color2, int direction);
 
