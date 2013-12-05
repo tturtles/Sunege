@@ -10,7 +10,7 @@ import com.example.Sunege.framework.Graphics;
 
 public class Ke extends Sprite {
 
-	private static final float TICK_INITIAL = 1.0f;
+	public static final float TICK_INITIAL = 10.0f; // すね毛が伸びる速度
 	private static float tick = TICK_INITIAL; // 更新速度
 	private float tickTime;
 	private static int ADD_LEVEL = 10;
@@ -29,13 +29,16 @@ public class Ke extends Sprite {
 		touch_height = 25;
 		Random rand = new Random();
 		this.x = rand.nextInt(480 - width);
-		this.y = rand.nextInt((800 - 245)) + 100;
+		int w_y = 0;
+		while (w_y < 100)
+			w_y = rand.nextInt(700 - image_height);
+		this.y = w_y;
 		this.level = ADD_LEVEL;
 	}
-	
+
 	public Ke(double x, double y, int level, String type) {
 		this.x = x;
-		this.y = y; 
+		this.y = y;
 		this.level = level;
 		this.type = type;
 		this.image = Assets.image_ke;
@@ -44,7 +47,7 @@ public class Ke extends Sprite {
 		touch_width = 25;
 		touch_height = 25;
 	}
-	
+
 	@Override
 	public void Update(float deltaTime) {
 		tickTime += deltaTime;
@@ -60,8 +63,10 @@ public class Ke extends Sprite {
 		Rect dst = new Rect((int) x, (int) y, (int) x + image_width,
 				(int) (y + (image_height * (level * 0.01))));
 		g.drawPixmap(Assets.image_ke, src, dst);
+		// g.drawTextAlp("" + level, (float)x, (float)y, Color.RED, 15); //
+		// レベル表示
 	}
-	
+
 	public void setLevel(int newlevel) {
 		this.level = newlevel;
 	}

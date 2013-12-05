@@ -32,28 +32,34 @@ public class PlayScreen extends Screen {
 	private int count_shaved = 0;
 	private Point pos;
 	private boolean flag_s = false;
+	private int hps[];
+	private int hyde[] = { 100, 200, 300, 400, 500 };
 
 	public PlayScreen(Game game) {
 		super(game);
+		hps = new int[5];
 		long difference;
 		world = new World();
 		sick = new Sickhydro(999);
 		pos = new Point(); // [0]=前の位置　[1]=次の位置
 		String[][] list = Utils.readSaveData(game.getFileIO());
+		for (int i = 0; i < 5; i++)
+			hps[i] = Integer.parseInt(list[0][i + 2]);
+		difference = (System.currentTimeMillis()) - Long.parseLong(list[0][7]);
+		difference = difference + 1000L;
+		// SimpleDateFormat D = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		// Log.d("TIME1", "" + D.format(new Date(System.currentTimeMillis())));
+		// Log.d("TIME2", "" + D.format(new Date(Long.parseLong(list[0][7]))));
+		// D = new SimpleDateFormat("HHHH:mm:ss");
+		// Log.d("TIME3", "" + D.format(new Date(difference)));
+		// Log.d("追加するすね毛の本数", "" + (difference / 60000)); // 60秒ごと
 		count_shaved = Integer.parseInt(list[0][0]);
 		if (count_shaved == 0)
 			world.load();
 		else
-			world.load(Utils.readSunegeData(game.getFileIO()));
-		difference = (System.currentTimeMillis()) - Long.parseLong(list[0][7]);
-		difference = difference + 1000L;
-		SimpleDateFormat D = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Log.d("TIME1", "" + D.format(new Date(System.currentTimeMillis())));
-		Log.d("TIME2", "" + D.format(new Date(Long.parseLong(list[0][7]))));
-		D = new SimpleDateFormat("HHHH:mm:ss");
-		Log.d("TIME3", "" + D.format(new Date(difference)));
-		Log.d("追加するすね毛の本数", "" + (difference / 60000)); // 60秒ごと
-		world.addSunege((int) difference / 60000);
+			world.load(Utils.readSunegeData(game.getFileIO()),
+					(int) difference / 1000);
+		world.addSunege((int) difference / 1000); // 1秒単位にして渡す
 	}
 
 	@Override
@@ -120,7 +126,13 @@ public class PlayScreen extends Screen {
 					state = GameState.ItemSelecting;
 				else if (isBounds(event, 440, 0, 40, 40))
 					world.load();
-				else {
+				else if (isBounds(event, 0, 700, 480, 100)) {
+					for (int j = 0; j < hps.length; j++) {
+						if (isBounds(event, 0, 700, 80 * j, 100))
+							sick = new Sickhydro(hyde[j]);
+					}
+					flag_s = false;
+				} else {
 					sick.setFlag(false);
 					sick.setXY(-sick.width, -sick.height);
 				}
@@ -218,8 +230,15 @@ public class PlayScreen extends Screen {
 
 		g.drawRect(440, 0, 40, 40, Color.RED, 150);
 		g.drawPixmap(Assets.bt_itemselect, 0, 0);
-		g.drawTextAlp("剃った本数:", 210, 40, Color.BLACK, 35);
+		g.drawTextAlp("すね毛ポイント:", 210, 30, Color.BLACK, 30);
 		g.drawTextAlp("" + count_shaved, 400, 70, Color.BLACK, 50);
+		g.drawLine(0, 700, 480, 700, Color.BLACK, 2);
+		for (int i = 0; i < 5; i++) {
+			g.drawTextAlp((i + 1) + "枚刃", 10 + 80 * (i + 1), 730, Color.BLACK,
+					20);
+			g.drawTextAlp("" + hps[i], 10 + 80 * (i + 1), 780, Color.BLACK, 40);
+			g.drawLine(80 * (i + 1), 700, 80 * (i + 1), 800, Color.BLACK, 2);
+		}
 	}
 
 	private void drawGameOverUI() {
