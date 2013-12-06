@@ -114,7 +114,7 @@ public class PlayScreen extends Screen {
 					flag_s = true;
 				}
 			case MotionEvent.ACTION_DOWN:
-				if (!isBounds(event, 440, 0, 40, 40)) {
+				if (!isBounds(event, 440, 0, 40, 40)&&isBounds(event, 0, 100, 480, 600)) {
 					sick.setFlag(true);
 					sick.setXY(event.x, event.y);
 					pos.x = event.x;
@@ -127,11 +127,16 @@ public class PlayScreen extends Screen {
 				else if (isBounds(event, 440, 0, 40, 40))
 					world.load();
 				else if (isBounds(event, 0, 700, 480, 100)) {
-					for (int j = 0; j < hps.length; j++) {
-						if (isBounds(event, 0, 700, 80 * j, 100))
-							sick = new Sickhydro(hyde[j]);
-					}
-					flag_s = false;
+					if (isBounds(event, 80, 700, 80, 100))
+						sick = new Sickhydro(hyde[0]);
+					if (isBounds(event, 160, 700, 80, 100))
+						sick = new Sickhydro(hyde[1]);
+					if (isBounds(event, 240, 700, 80, 100))
+						sick = new Sickhydro(hyde[2]);
+					if (isBounds(event, 320, 700, 80, 100))
+						sick = new Sickhydro(hyde[3]);
+					if (isBounds(event, 400, 700, 80, 100))
+						sick = new Sickhydro(hyde[4]);
 				} else {
 					sick.setFlag(false);
 					sick.setXY(-sick.width, -sick.height);
