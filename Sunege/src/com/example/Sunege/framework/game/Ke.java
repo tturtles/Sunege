@@ -20,6 +20,9 @@ public class Ke extends Sprite {
 	private int image_height;
 	private int touch_width;
 	private int touch_height;
+	private boolean flag_select = false;
+	private boolean flag_end = false;
+
 
 	public Ke() {
 		this.image = Assets.image_ke;
@@ -70,5 +73,22 @@ public class Ke extends Sprite {
 	public void setLevel(int newlevel) {
 		this.level = newlevel;
 	}
+	
+	public void setFlag_select(boolean flag_select) {
+		this.flag_select = flag_select;
+	}
+
+	public int getimage_width() {
+		return image_width;
+	}
+
+	public int getimage_height() {
+		return image_height;
+	}
+
+	public boolean isFlag_select() {
+		return flag_select;
+	}
+
 
 }

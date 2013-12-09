@@ -1,6 +1,7 @@
 package com.example.Sunege.framework.game;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -34,6 +35,7 @@ public class PlayScreen extends Screen {
 	private boolean flag_s = false; // 横スライド、つまりスネをカミソリで切った場合
 	private int hps[];
 	private int sick_no = 1; // 刃の枚数　1 = 1枚刃
+	private LinkedList<Ke> kelist;
 
 	public PlayScreen(Game game) {
 		super(game);
@@ -41,6 +43,7 @@ public class PlayScreen extends Screen {
 		long difference;
 		world = new World();
 		pos = new Point(); // [0]=前の位置　[1]=次の位置
+
 		String[][] list = Utils.readSaveData(game.getFileIO());
 		shaved_sum = Integer.parseInt(list[0][0]); // 剃ったすね毛の総数取得
 		for (int i = 0; i < 5; i++)
@@ -53,7 +56,8 @@ public class PlayScreen extends Screen {
 			world.load(Utils.readSunegeData(game.getFileIO()),
 					(int) difference / 1000);
 		world.addSunege((int) difference / 1000); // 1秒単位にして渡す
-		for (int i = 0; i < hps.length; i++)		// 各カミソリのＨＰを取得
+		for (int i = 0; i < hps.length; i++)
+			// 各カミソリのＨＰを取得
 			hps[i] = Integer.parseInt(list[0][i + 2]);
 		sick = new Sickhydro(hps[0]);
 		TimeLog(list, difference);
@@ -113,13 +117,25 @@ public class PlayScreen extends Screen {
 			TouchEvent event = touchEvents.get(i);
 			switch (event.type) {
 			case MotionEvent.ACTION_MOVE:
-				if (event.y > 100 && event.y < 700)
-					if (interval_y < -(pos.x - event.x)
-							|| interval_y < (pos.x - event.x)) {
-						if (!flag_s)
-							Assets.voice01.play(1);
-						flag_s = true;
+				if (event.y > 100 && event.y < 700) {
+					switch (sick_no) {
+					case 0: // 毛を抜く判定（毛抜き時）
+						int move_range = 10;
+						if (move_range < -(pos.x - event.x)
+								|| move_range < (pos.x - event.x))
+							flag_s = true;
+
+					default: // カミソリで肌を傷つけた時の判定（カミソリ時）
+						if (interval_y < -(pos.x - event.x)
+								|| interval_y < (pos.x - event.x)) {
+							if (!flag_s)
+								Assets.voice01.play(1);
+							flag_s = true;
+							break;
+						}
 					}
+				}
+
 			case MotionEvent.ACTION_DOWN:
 				if (!isBounds(event, 440, 0, 40, 40)
 						&& isBounds(event, 0, 100, 480, 600)) {
@@ -129,6 +145,7 @@ public class PlayScreen extends Screen {
 					pos.y = event.y;
 					break;
 				}
+
 			case MotionEvent.ACTION_UP:
 				if (isBounds(event, 0, 0, 200, 100))
 					state = GameState.ItemSelecting;
@@ -230,13 +247,22 @@ public class PlayScreen extends Screen {
 			if (sick.isCollision(sprite)) {
 				if (sprite instanceof Ke) {
 					Ke ke = (Ke) sprite;
-					if (!sick.getFlag_end())
+					if (!sick.getFlag_end() && sick_no > 0) { // 各カミソリ処理
 						if (sprites.remove(ke)) {
 							if (sick_no > 0) {
 								shaved_sum++;
 								sick.setHp();
 							}
 						}
+					} else  if(sick_no==0){ // 毛抜き処理
+						if (isBounds(pos, (int) ke.x, (int) ke.y,
+								ke.getimage_width(), ke.getimage_height())) {
+							ke.setFlag_select(true);
+						} else if (flag_s && ke.isFlag_select()) {
+							sprites.remove(ke);
+							shaved_sum++;
+						}
+					}
 					break;
 				}
 			}
@@ -278,6 +304,14 @@ public class PlayScreen extends Screen {
 			int height) {
 		if (event.x > x && event.x < x + width - 1 && event.y > y
 				&& event.y < y + height - 1)
+			return true;
+		else
+			return false;
+	}
+
+	private boolean isBounds(Point pos, int x, int y, int width, int height) {
+		if (pos.x > x && pos.x < x + width - 1 && pos.y > y
+				&& pos.y < y + height - 1)
 			return true;
 		else
 			return false;
