@@ -7,6 +7,11 @@ import com.example.Sunege.framework.Graphics;
 public class Sickhydro extends Sprite {
 	
 	
+	public int getHp() {
+		return hp;
+	}
+
+
 	private boolean flag_draw = false; // 画像を描画するかのフラグ
 	private boolean flag_end = false;
 	private int hp;

@@ -33,7 +33,7 @@ public class PlayScreen extends Screen {
 	private Point pos;
 	private boolean flag_s = false;
 	private int hps[];
-	private int hyde[] = { 100, 200, 300, 400, 500 };
+	private int sick_no = 1;	// 刃の枚数　1 = 1枚刃
 
 	public PlayScreen(Game game) {
 		super(game);
@@ -60,6 +60,9 @@ public class PlayScreen extends Screen {
 			world.load(Utils.readSunegeData(game.getFileIO()),
 					(int) difference / 1000);
 		world.addSunege((int) difference / 1000); // 1秒単位にして渡す
+		for (int i = 0; i < hps.length; i++)
+			hps[i] = Integer.parseInt(list[0][i + 2]);
+		sick = new Sickhydro(hps[0]);
 	}
 
 	@Override
@@ -114,7 +117,8 @@ public class PlayScreen extends Screen {
 					flag_s = true;
 				}
 			case MotionEvent.ACTION_DOWN:
-				if (!isBounds(event, 440, 0, 40, 40)&&isBounds(event, 0, 100, 480, 600)) {
+				if (!isBounds(event, 440, 0, 40, 40)
+						&& isBounds(event, 0, 100, 480, 600)) {
 					sick.setFlag(true);
 					sick.setXY(event.x, event.y);
 					pos.x = event.x;
@@ -128,15 +132,16 @@ public class PlayScreen extends Screen {
 					world.load();
 				else if (isBounds(event, 0, 700, 480, 100)) {
 					if (isBounds(event, 80, 700, 80, 100))
-						sick = new Sickhydro(hyde[0]);
+						sick_no = 1;
 					if (isBounds(event, 160, 700, 80, 100))
-						sick = new Sickhydro(hyde[1]);
+						sick_no = 2;
 					if (isBounds(event, 240, 700, 80, 100))
-						sick = new Sickhydro(hyde[2]);
+						sick_no = 3;
 					if (isBounds(event, 320, 700, 80, 100))
-						sick = new Sickhydro(hyde[3]);
+						sick_no = 4;
 					if (isBounds(event, 400, 700, 80, 100))
-						sick = new Sickhydro(hyde[4]);
+						sick_no = 5;
+					sick = new Sickhydro(hps[sick_no]);
 				} else {
 					sick.setFlag(false);
 					sick.setXY(-sick.width, -sick.height);
@@ -159,6 +164,7 @@ public class PlayScreen extends Screen {
 			}
 		}
 		sick.Update();
+		hps[sick_no-1] = sick.getHp();
 	}
 
 	private void updateGameOver(List<TouchEvent> touchEvents) {
