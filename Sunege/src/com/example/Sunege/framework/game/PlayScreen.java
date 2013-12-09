@@ -29,40 +29,43 @@ public class PlayScreen extends Screen {
 	private World world;
 	private Sickhydro sick;
 	private int x = 0;
-	private int count_shaved = 0;
+	private int shaved_sum = 0; // 剃った毛の総数
 	private Point pos;
-	private boolean flag_s = false;
+	private boolean flag_s = false; // 横スライド、つまりスネをカミソリで切った場合
 	private int hps[];
-	private int sick_no = 1;	// 刃の枚数　1 = 1枚刃
+	private int sick_no = 1; // 刃の枚数　1 = 1枚刃
 
 	public PlayScreen(Game game) {
 		super(game);
 		hps = new int[5];
 		long difference;
 		world = new World();
-		sick = new Sickhydro(999);
 		pos = new Point(); // [0]=前の位置　[1]=次の位置
 		String[][] list = Utils.readSaveData(game.getFileIO());
+		shaved_sum = Integer.parseInt(list[0][0]); // 剃ったすね毛の総数取得
 		for (int i = 0; i < 5; i++)
+			// 前回よりの経過時間の取得
 			hps[i] = Integer.parseInt(list[0][i + 2]);
 		difference = (System.currentTimeMillis()) - Long.parseLong(list[0][7]);
-		difference = difference + 1000L;
-		// SimpleDateFormat D = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		// Log.d("TIME1", "" + D.format(new Date(System.currentTimeMillis())));
-		// Log.d("TIME2", "" + D.format(new Date(Long.parseLong(list[0][7]))));
-		// D = new SimpleDateFormat("HHHH:mm:ss");
-		// Log.d("TIME3", "" + D.format(new Date(difference)));
-		// Log.d("追加するすね毛の本数", "" + (difference / 60000)); // 60秒ごと
-		count_shaved = Integer.parseInt(list[0][0]);
-		if (count_shaved == 0)
+		if (shaved_sum == 0)
 			world.load();
 		else
 			world.load(Utils.readSunegeData(game.getFileIO()),
 					(int) difference / 1000);
 		world.addSunege((int) difference / 1000); // 1秒単位にして渡す
-		for (int i = 0; i < hps.length; i++)
+		for (int i = 0; i < hps.length; i++)		// 各カミソリのＨＰを取得
 			hps[i] = Integer.parseInt(list[0][i + 2]);
 		sick = new Sickhydro(hps[0]);
+		TimeLog(list, difference);
+	}
+
+	private void TimeLog(String[][] list, long difference) {
+		SimpleDateFormat D = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Log.d("TIME1", "" + D.format(new Date(System.currentTimeMillis())));
+		Log.d("TIME2", "" + D.format(new Date(Long.parseLong(list[0][7]))));
+		D = new SimpleDateFormat("HHHH:mm:ss");
+		Log.d("TIME3", "" + D.format(new Date(difference)));
+		Log.d("追加するすね毛の本数", "" + (difference / 60000)); // 60秒ごと
 	}
 
 	@Override
@@ -88,15 +91,15 @@ public class PlayScreen extends Screen {
 				if (isBounds(event, 0, 750, 480, 800))
 					state = GameState.Playing;
 				if (isBounds(event, 0, 170, 480, 100))
-					sick = new Sickhydro(10);
+					hps[0] = 100;
 				if (isBounds(event, 0, 270, 480, 100))
-					sick = new Sickhydro(20);
+					hps[1] = 200;
 				if (isBounds(event, 0, 370, 480, 100))
-					sick = new Sickhydro(30);
+					hps[2] = 300;
 				if (isBounds(event, 0, 470, 480, 100))
-					sick = new Sickhydro(40);
+					hps[3] = 400;
 				if (isBounds(event, 0, 570, 480, 100))
-					sick = new Sickhydro(1000);
+					hps[4] = 500;
 				return;
 			}
 		}
@@ -110,12 +113,13 @@ public class PlayScreen extends Screen {
 			TouchEvent event = touchEvents.get(i);
 			switch (event.type) {
 			case MotionEvent.ACTION_MOVE:
-				if (interval_y < -(pos.x - event.x)
-						|| interval_y < (pos.x - event.x)) {
-					if (!flag_s)
-						Assets.voice01.play(1);
-					flag_s = true;
-				}
+				if (event.y > 100 && event.y < 700)
+					if (interval_y < -(pos.x - event.x)
+							|| interval_y < (pos.x - event.x)) {
+						if (!flag_s)
+							Assets.voice01.play(1);
+						flag_s = true;
+					}
 			case MotionEvent.ACTION_DOWN:
 				if (!isBounds(event, 440, 0, 40, 40)
 						&& isBounds(event, 0, 100, 480, 600)) {
@@ -131,17 +135,19 @@ public class PlayScreen extends Screen {
 				else if (isBounds(event, 440, 0, 40, 40))
 					world.load();
 				else if (isBounds(event, 0, 700, 480, 100)) {
-					if (isBounds(event, 80, 700, 80, 100))
+					if (isBounds(event, 0, 700, 80, 100))
+						sick_no = 0;
+					else if (isBounds(event, 80, 700, 80, 100))
 						sick_no = 1;
-					if (isBounds(event, 160, 700, 80, 100))
+					else if (isBounds(event, 160, 700, 80, 100))
 						sick_no = 2;
-					if (isBounds(event, 240, 700, 80, 100))
+					else if (isBounds(event, 240, 700, 80, 100))
 						sick_no = 3;
-					if (isBounds(event, 320, 700, 80, 100))
+					else if (isBounds(event, 320, 700, 80, 100))
 						sick_no = 4;
-					if (isBounds(event, 400, 700, 80, 100))
+					else if (isBounds(event, 400, 700, 80, 100))
 						sick_no = 5;
-					sick = new Sickhydro(hps[sick_no]);
+					sick = new Sickhydro(sick_no > 0 ? hps[sick_no - 1] : 0);
 				} else {
 					sick.setFlag(false);
 					sick.setXY(-sick.width, -sick.height);
@@ -164,7 +170,8 @@ public class PlayScreen extends Screen {
 			}
 		}
 		sick.Update();
-		hps[sick_no-1] = sick.getHp();
+		if (sick_no > 0)
+			hps[sick_no - 1] = sick.getHp();
 	}
 
 	private void updateGameOver(List<TouchEvent> touchEvents) {
@@ -205,7 +212,7 @@ public class PlayScreen extends Screen {
 		Graphics g = game.getGraphics();
 		g.drawRect(0, 0, 481, 801, Color.rgb(255, 241, 207));
 		world.draw(g);
-		sick.draw(g);
+		sick.draw(g, sick_no);
 		if (x > 480)
 			x = 0;
 		else
@@ -225,8 +232,10 @@ public class PlayScreen extends Screen {
 					Ke ke = (Ke) sprite;
 					if (!sick.getFlag_end())
 						if (sprites.remove(ke)) {
-							count_shaved++;
-							sick.setHp();
+							if (sick_no > 0) {
+								shaved_sum++;
+								sick.setHp();
+							}
 						}
 					break;
 				}
@@ -242,14 +251,16 @@ public class PlayScreen extends Screen {
 		g.drawRect(440, 0, 40, 40, Color.RED, 150);
 		g.drawPixmap(Assets.bt_itemselect, 0, 0);
 		g.drawTextAlp("すね毛ポイント:", 210, 30, Color.BLACK, 30);
-		g.drawTextAlp("" + count_shaved, 400, 70, Color.BLACK, 50);
+		g.drawTextAlp("" + shaved_sum, 400, 70, Color.BLACK, 50);
 		g.drawLine(0, 700, 480, 700, Color.BLACK, 2);
+		g.drawTextAlp("sick_no" + sick_no, 300, 100, Color.BLACK, 20);
 		for (int i = 0; i < 5; i++) {
 			g.drawTextAlp((i + 1) + "枚刃", 10 + 80 * (i + 1), 730, Color.BLACK,
 					20);
 			g.drawTextAlp("" + hps[i], 10 + 80 * (i + 1), 780, Color.BLACK, 40);
 			g.drawLine(80 * (i + 1), 700, 80 * (i + 1), 800, Color.BLACK, 2);
 		}
+		g.drawRect((sick_no * 80) + 1, 701, 78, 100, Color.BLUE, 125);
 	}
 
 	private void drawGameOverUI() {
@@ -283,8 +294,8 @@ public class PlayScreen extends Screen {
 	@Override
 	public void dispose() {
 		Long time = System.currentTimeMillis();
-		Utils.addSaveData(game.getFileIO(), count_shaved, 0, 1, 0, 0, 0, 0,
-				time);
+		Utils.addSaveData(game.getFileIO(), shaved_sum, 0, hps[0], hps[1],
+				hps[2], hps[3], hps[4], time);
 		LinkedList sprites = world.getSprites();
 		Iterator iterator = sprites.iterator();
 		int i = 0;

@@ -28,7 +28,7 @@ public class Ke extends Sprite {
 		touch_width = 25;
 		touch_height = 25;
 		Random rand = new Random();
-		this.x = rand.nextInt(480 - width);
+		this.x = rand.nextInt(480 - image_width);
 		int w_y = 0;
 		while (w_y < 100)
 			w_y = rand.nextInt(700 - image_height);

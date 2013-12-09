@@ -16,7 +16,7 @@ public class LoadingScreen extends Screen {
 		Graphics g = game.getGraphics();
 		Assets.image_ke = g.newPixmap("ke.png", PixmapFormat.ARGB4444);
 		Assets.bt_itemselect = g.newPixmap("bt_itemselect.png", PixmapFormat.ARGB4444);
-		Assets.voice01 = game.getAudio().newSound("sound_enter.mp3");
+		Assets.voice01 = game.getAudio().newSound("voice01.aac");
 		Utils.load(game.getFileIO());
 		game.setScreen(new PlayScreen(game));
 	}
