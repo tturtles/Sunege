@@ -23,7 +23,6 @@ public class Ke extends Sprite {
 	private boolean flag_select = false;
 	private boolean flag_end = false;
 
-
 	public Ke() {
 		this.image = Assets.image_ke;
 		image_width = 24;
@@ -66,14 +65,21 @@ public class Ke extends Sprite {
 		Rect dst = new Rect((int) x, (int) y, (int) x + image_width,
 				(int) (y + (image_height * (level * 0.01))));
 		g.drawPixmap(Assets.image_ke, src, dst);
-		// g.drawTextAlp("" + level, (float)x, (float)y, Color.RED, 15); //
+		int margin_xy = 50;
+		if (flag_select)
+			g.drawRect((int) x-margin_xy/2, (int) y, 50, image_height,
+					Color.GREEN, 125);
+		// else
+		// g.drawRect((int)x-margin_xy/2, (int) y, 50, image_height,
+		// Color.BLUE, 125);
+//		 g.drawTextAlp("" + level, (float)x, (float)y, Color.RED, 15); //
 		// レベル表示
 	}
 
 	public void setLevel(int newlevel) {
 		this.level = newlevel;
 	}
-	
+
 	public void setFlag_select(boolean flag_select) {
 		this.flag_select = flag_select;
 	}
@@ -89,6 +95,5 @@ public class Ke extends Sprite {
 	public boolean isFlag_select() {
 		return flag_select;
 	}
-
 
 }

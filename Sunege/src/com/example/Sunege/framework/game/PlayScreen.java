@@ -1,13 +1,11 @@
 package com.example.Sunege.framework.game;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import android.app.UiModeManager;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -29,13 +27,12 @@ public class PlayScreen extends Screen {
 
 	private World world;
 	private Sickhydro sick;
-	private int x = 0;
 	private int shaved_sum = 0; // 剃った毛の総数
 	private Point pos;
 	private boolean flag_s = false; // 横スライド、つまりスネをカミソリで切った場合
 	private int hps[];
 	private int sick_no = 1; // 刃の枚数　1 = 1枚刃
-	private LinkedList<Ke> kelist;
+	private boolean flag_select; // 1本でも毛を選択している状態ならtrue
 
 	public PlayScreen(Game game) {
 		super(game);
@@ -120,7 +117,7 @@ public class PlayScreen extends Screen {
 				if (event.y > 100 && event.y < 700) {
 					switch (sick_no) {
 					case 0: // 毛を抜く判定（毛抜き時）
-						int move_range = 10;
+						int move_range = 5;
 						if (move_range < -(pos.x - event.x)
 								|| move_range < (pos.x - event.x))
 							flag_s = true;
@@ -165,6 +162,7 @@ public class PlayScreen extends Screen {
 					else if (isBounds(event, 400, 700, 80, 100))
 						sick_no = 5;
 					sick = new Sickhydro(sick_no > 0 ? hps[sick_no - 1] : 0);
+					flag_select = sick_no > 0 ? false : flag_select;
 				} else {
 					sick.setFlag(false);
 					sick.setXY(-sick.width, -sick.height);
@@ -230,15 +228,9 @@ public class PlayScreen extends Screen {
 		g.drawRect(0, 0, 481, 801, Color.rgb(255, 241, 207));
 		world.draw(g);
 		sick.draw(g, sick_no);
-		if (x > 480)
-			x = 0;
-		else
-			x++;
-		if (flag_s) {
+		if (flag_s)
 			g.drawRect(100, 100, 100, 100, Color.BLUE);
-		}
 
-		g.drawLine(0, 3, x, 3, Color.BLUE, 5); // 描画されているか確認用
 		LinkedList sprites = world.getSprites();
 		Iterator iterator = sprites.iterator(); // Iterator=コレクション内の要素を順番に取り出す方法
 		while (iterator.hasNext()) { // iteratorの中で次の要素がある限りtrue
@@ -254,13 +246,18 @@ public class PlayScreen extends Screen {
 								sick.setHp();
 							}
 						}
-					} else  if(sick_no==0){ // 毛抜き処理
-						if (isBounds(pos, (int) ke.x, (int) ke.y,
-								ke.getimage_width(), ke.getimage_height())) {
+					} else if (sick_no == 0) { // 毛抜き処理
+						Log.d("ポイント", "A");
+						int margin_xy = 50;
+						if (isBounds(pos, (int) ke.x - margin_xy / 2,
+								(int) ke.y, 50, ke.getimage_height())
+								&& !flag_select) {
 							ke.setFlag_select(true);
+							flag_select = true;
 						} else if (flag_s && ke.isFlag_select()) {
 							sprites.remove(ke);
 							shaved_sum++;
+							flag_select = false;
 						}
 					}
 					break;
@@ -276,10 +273,14 @@ public class PlayScreen extends Screen {
 
 		g.drawRect(440, 0, 40, 40, Color.RED, 150);
 		g.drawPixmap(Assets.bt_itemselect, 0, 0);
-		g.drawTextAlp("すね毛ポイント:", 210, 30, Color.BLACK, 30);
-		g.drawTextAlp("" + shaved_sum, 400, 70, Color.BLACK, 50);
+		// g.drawTextAlp("すね毛ポイント:", 210, 30, Color.BLACK, 30);
+		// g.drawTextAlp("" + shaved_sum, 400, 70, Color.BLACK, 50);
+		g.drawTextAlp("すね毛ポイント:", 210, 25, Color.BLACK, 20);
+		g.drawTextAlp("" + shaved_sum, 360, 25, Color.BLACK, 20);
+		g.drawTextAlp("sick_no" + sick_no, 300, 50, Color.BLACK, 20);
+		g.drawTextAlp("flag_select : " + flag_select, 210, 70, Color.BLACK, 20);
+		g.drawTextAlp("pos.x : "+pos.x+ "  pos.y : "+pos.y, 210, 90, Color.BLACK, 20);
 		g.drawLine(0, 700, 480, 700, Color.BLACK, 2);
-		g.drawTextAlp("sick_no" + sick_no, 300, 100, Color.BLACK, 20);
 		for (int i = 0; i < 5; i++) {
 			g.drawTextAlp((i + 1) + "枚刃", 10 + 80 * (i + 1), 730, Color.BLACK,
 					20);
