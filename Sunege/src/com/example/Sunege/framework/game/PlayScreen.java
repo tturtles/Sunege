@@ -29,9 +29,9 @@ public class PlayScreen extends Screen {
 	private Sickhydro sick;
 	private int shaved_sum = 0; // 剃った毛の総数
 	private Point pos;
-	private boolean flag_s = false; // 横スライド、つまりスネをカミソリで切った場合
+	private boolean flag_slide = false; // 横スライド、つまりスネをカミソリで切った場合
 	private int hps[];
-	private int sick_no = 1; // 刃の枚数　1 = 1枚刃
+	private int sick_no = 0; // 刃の枚数　1 = 1枚刃
 	private boolean flag_select; // 1本でも毛を選択している状態ならtrue
 
 	public PlayScreen(Game game) {
@@ -40,7 +40,6 @@ public class PlayScreen extends Screen {
 		long difference;
 		world = new World();
 		pos = new Point(); // [0]=前の位置　[1]=次の位置
-
 		String[][] list = Utils.readSaveData(game.getFileIO());
 		shaved_sum = Integer.parseInt(list[0][0]); // 剃ったすね毛の総数取得
 		for (int i = 0; i < 5; i++)
@@ -56,7 +55,7 @@ public class PlayScreen extends Screen {
 		for (int i = 0; i < hps.length; i++)
 			// 各カミソリのＨＰを取得
 			hps[i] = Integer.parseInt(list[0][i + 2]);
-		sick = new Sickhydro(hps[0]);
+		sick = new Sickhydro(0);
 		TimeLog(list, difference);
 	}
 
@@ -108,7 +107,7 @@ public class PlayScreen extends Screen {
 
 	private void updatePlaying(List<TouchEvent> touchEvents, float deltaTime) {
 		// ゲーム中のタッチ処理書き込み
-		int interval_y = 5;
+		int interval_y = 2;
 		int len = touchEvents.size();
 		for (int i = 0; i < len; i++) {
 			TouchEvent event = touchEvents.get(i);
@@ -117,17 +116,19 @@ public class PlayScreen extends Screen {
 				if (event.y > 100 && event.y < 700) {
 					switch (sick_no) {
 					case 0: // 毛を抜く判定（毛抜き時）
-						int move_range = 5;
+						int move_range = 15;
 						if (move_range < -(pos.x - event.x)
-								|| move_range < (pos.x - event.x))
-							flag_s = true;
+								|| move_range < (pos.x - event.x)
+								|| move_range < -(pos.y - event.y)
+								|| move_range < (pos.y - event.y))
+							flag_slide = true;
 
 					default: // カミソリで肌を傷つけた時の判定（カミソリ時）
 						if (interval_y < -(pos.x - event.x)
 								|| interval_y < (pos.x - event.x)) {
-							if (!flag_s)
+							if (!flag_slide)
 								Assets.voice01.play(1);
-							flag_s = true;
+							flag_slide = true;
 							break;
 						}
 					}
@@ -138,8 +139,10 @@ public class PlayScreen extends Screen {
 						&& isBounds(event, 0, 100, 480, 600)) {
 					sick.setFlag(true);
 					sick.setXY(event.x, event.y);
-					pos.x = event.x;
-					pos.y = event.y;
+					if (pos.x < 0) {
+						pos.x = event.x;
+						pos.y = event.y;
+					}
 					break;
 				}
 
@@ -169,7 +172,7 @@ public class PlayScreen extends Screen {
 				}
 				pos.x = -1;
 				pos.y = -1;
-				flag_s = false;
+				flag_slide = false;
 				break;
 			}
 		}
@@ -182,7 +185,7 @@ public class PlayScreen extends Screen {
 			if (sprite instanceof Ke) {
 				Ke ke = (Ke) sprite;
 				ke.Update(deltaTime);
-			}
+			} else	sprite.Update();
 		}
 		sick.Update();
 		if (sick_no > 0)
@@ -228,43 +231,47 @@ public class PlayScreen extends Screen {
 		g.drawRect(0, 0, 481, 801, Color.rgb(255, 241, 207));
 		world.draw(g);
 		sick.draw(g, sick_no);
-		if (flag_s)
+		if (flag_slide)
 			g.drawRect(100, 100, 100, 100, Color.BLUE);
 
 		LinkedList sprites = world.getSprites();
 		Iterator iterator = sprites.iterator(); // Iterator=コレクション内の要素を順番に取り出す方法
 		while (iterator.hasNext()) { // iteratorの中で次の要素がある限りtrue
 			Sprite sprite = (Sprite) iterator.next();
-			sprite.Update();
-			if (sick.isCollision(sprite)) {
-				if (sprite instanceof Ke) {
-					Ke ke = (Ke) sprite;
-					if (!sick.getFlag_end() && sick_no > 0) { // 各カミソリ処理
+			if (sprite instanceof Ke) {
+				Ke ke = (Ke) sprite;
+				/********************************** ここから↓　switch分の方がよいかも...(12/12) **********************************/
+				// カミソリ処理
+				if (sick_no > 0) {
+					if (sick.isCollision(sprite) && !sick.getFlag_end()) { // カミソリに毛がぶつかり、カミソリが使えるのなら
 						if (sprites.remove(ke)) {
-							if (sick_no > 0) {
-								shaved_sum++;
-								sick.setHp();
-							}
-						}
-					} else if (sick_no == 0) { // 毛抜き処理
-						Log.d("ポイント", "A");
-						int margin_xy = 50;
-						if (isBounds(pos, (int) ke.x - margin_xy / 2,
-								(int) ke.y, 50, ke.getimage_height())
-								&& !flag_select) {
-							ke.setFlag_select(true);
-							flag_select = true;
-						} else if (flag_s && ke.isFlag_select()) {
-							sprites.remove(ke);
 							shaved_sum++;
-							flag_select = false;
+							sick.setHp();
+							break;
 						}
 					}
-					break;
+				}
+
+				// 毛抜き処理
+				else if (sick_no == 0) {
+					int margin_xy = 0; // タップ範囲
+					if (isBounds(pos, (int) ke.x, (int) ke.y,
+							ke.getimage_width(), ke.getimage_height())
+							&& !flag_select) { // すね毛選択処理
+						ke.setFlag_select(true);
+						flag_select = true;
+						break;
+					} else if (flag_slide && ke.isFlag_select()) { // すね毛を剃る処理
+						if (sprites.remove(ke)) {
+							shaved_sum++;
+							flag_select = false;
+							break;
+						}
+					}
 				}
 			}
 		}
-
+		/**************************************************** ここまで ****************************************************/
 		iterator = sprites.iterator();
 		while (iterator.hasNext()) {
 			Sprite sprite = (Sprite) iterator.next();
@@ -279,7 +286,8 @@ public class PlayScreen extends Screen {
 		g.drawTextAlp("" + shaved_sum, 360, 25, Color.BLACK, 20);
 		g.drawTextAlp("sick_no" + sick_no, 300, 50, Color.BLACK, 20);
 		g.drawTextAlp("flag_select : " + flag_select, 210, 70, Color.BLACK, 20);
-		g.drawTextAlp("pos.x : "+pos.x+ "  pos.y : "+pos.y, 210, 90, Color.BLACK, 20);
+		g.drawTextAlp("pos.x : " + pos.x + "  pos.y : " + pos.y, 210, 90,
+				Color.BLACK, 20);
 		g.drawLine(0, 700, 480, 700, Color.BLACK, 2);
 		for (int i = 0; i < 5; i++) {
 			g.drawTextAlp((i + 1) + "枚刃", 10 + 80 * (i + 1), 730, Color.BLACK,
@@ -287,6 +295,7 @@ public class PlayScreen extends Screen {
 			g.drawTextAlp("" + hps[i], 10 + 80 * (i + 1), 780, Color.BLACK, 40);
 			g.drawLine(80 * (i + 1), 700, 80 * (i + 1), 800, Color.BLACK, 2);
 		}
+		g.drawTextAlp("毛抜き", 10, 730, Color.BLACK, 20);
 		g.drawRect((sick_no * 80) + 1, 701, 78, 100, Color.BLUE, 125);
 	}
 

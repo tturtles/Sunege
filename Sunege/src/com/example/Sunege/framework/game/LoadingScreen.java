@@ -15,6 +15,7 @@ public class LoadingScreen extends Screen {
 	public void update(float deltaTime) {
 		Graphics g = game.getGraphics();
 		Assets.image_ke = g.newPixmap("ke.png", PixmapFormat.ARGB4444);
+		Assets.image_blood = g.newPixmap("blood.png", PixmapFormat.ARGB4444);
 		Assets.bt_itemselect = g.newPixmap("bt_itemselect.png", PixmapFormat.ARGB4444);
 		Assets.voice01 = game.getAudio().newSound("voice01.aac");
 		Utils.load(game.getFileIO());

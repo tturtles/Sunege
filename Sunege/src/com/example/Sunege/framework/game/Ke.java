@@ -21,7 +21,8 @@ public class Ke extends Sprite {
 	private int touch_width;
 	private int touch_height;
 	private boolean flag_select = false;
-	private boolean flag_end = false;
+	private int move_x = 0;
+	private int move_y = 0;
 
 	public Ke() {
 		this.image = Assets.image_ke;
@@ -58,6 +59,8 @@ public class Ke extends Sprite {
 			if (level < 110)
 				level += ADD_LEVEL;
 		}
+		this.x += move_x;
+		this.y += move_y;
 	}
 
 	public void draw(Graphics g) {
@@ -65,15 +68,20 @@ public class Ke extends Sprite {
 		Rect dst = new Rect((int) x, (int) y, (int) x + image_width,
 				(int) (y + (image_height * (level * 0.01))));
 		g.drawPixmap(Assets.image_ke, src, dst);
-		int margin_xy = 50;
-		if (flag_select)
-			g.drawRect((int) x-margin_xy/2, (int) y, 50, image_height,
-					Color.GREEN, 125);
+		// if (flag_select)
+		// g.drawRect((int) x - margin_xy / 2, (int) y, 50,
+		// getimage_height(), Color.GREEN, 125);
 		// else
-		// g.drawRect((int)x-margin_xy/2, (int) y, 50, image_height,
+		// g.drawRect((int)x, (int) y, image_width, (int) (image_height * (level
+		// * 0.01)),
 		// Color.BLUE, 125);
-//		 g.drawTextAlp("" + level, (float)x, (float)y, Color.RED, 15); //
+		// g.drawTextAlp("" + level, (float)x, (float)y, Color.RED, 15);
 		// レベル表示
+	}
+
+	public void moveKe(int move_x, int move_y) {
+		this.move_x += move_x;
+		this.move_y += move_y;
 	}
 
 	public void setLevel(int newlevel) {
@@ -89,7 +97,7 @@ public class Ke extends Sprite {
 	}
 
 	public int getimage_height() {
-		return image_height;
+		return (int) (image_height * (level * 0.01));
 	}
 
 	public boolean isFlag_select() {
