@@ -65,18 +65,6 @@ public class Ke extends Sprite {
 
 	public void draw(Graphics g) {
 		Rect src = new Rect(0, 0, image_width, image_height);
-		Rect dst = new Rect((int) x, (int) y, (int) x + image_width,
-				(int) (y + (image_height * (level * 0.01))));
-		g.drawPixmap(Assets.image_ke, src, dst);
-		// if (flag_select)
-		// g.drawRect((int) x - margin_xy / 2, (int) y, 50,
-		// getimage_height(), Color.GREEN, 125);
-		// else
-		// g.drawRect((int)x, (int) y, image_width, (int) (image_height * (level
-		// * 0.01)),
-		// Color.BLUE, 125);
-		// g.drawTextAlp("" + level, (float)x, (float)y, Color.RED, 15);
-		// レベル表示
 	}
 
 	public void moveKe(int move_x, int move_y) {

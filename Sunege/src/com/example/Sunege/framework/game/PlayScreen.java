@@ -9,6 +9,7 @@ import java.util.List;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -28,7 +29,8 @@ public class PlayScreen extends Screen {
 	private World world;
 	private Sickhydro sick;
 	private int shaved_sum = 0; // 剃った毛の総数
-	private Point pos;
+	private Point pos; // Down時の座標
+	private Point now_pos;
 	private boolean flag_slide = false; // 横スライド、つまりスネをカミソリで切った場合
 	private int hps[];
 	private int sick_no = 0; // 刃の枚数　1 = 1枚刃
@@ -40,6 +42,7 @@ public class PlayScreen extends Screen {
 		long difference;
 		world = new World();
 		pos = new Point(); // [0]=前の位置　[1]=次の位置
+		now_pos = new Point();
 		String[][] list = Utils.readSaveData(game.getFileIO());
 		shaved_sum = Integer.parseInt(list[0][0]); // 剃ったすね毛の総数取得
 		for (int i = 0; i < 5; i++)
@@ -107,7 +110,6 @@ public class PlayScreen extends Screen {
 
 	private void updatePlaying(List<TouchEvent> touchEvents, float deltaTime) {
 		// ゲーム中のタッチ処理書き込み
-		int interval_y = 2;
 		int len = touchEvents.size();
 		for (int i = 0; i < len; i++) {
 			TouchEvent event = touchEvents.get(i);
@@ -116,7 +118,7 @@ public class PlayScreen extends Screen {
 				if (event.y > 100 && event.y < 700) {
 					switch (sick_no) {
 					case 0: // 毛を抜く判定（毛抜き時）
-						int move_range = 15;
+						int move_range = 15; // 毛を選択してどのくらい全方向に指をスライドさせたら抜くかの値
 						if (move_range < -(pos.x - event.x)
 								|| move_range < (pos.x - event.x)
 								|| move_range < -(pos.y - event.y)
@@ -124,11 +126,14 @@ public class PlayScreen extends Screen {
 							flag_slide = true;
 
 					default: // カミソリで肌を傷つけた時の判定（カミソリ時）
-						if (interval_y < -(pos.x - event.x)
-								|| interval_y < (pos.x - event.x)) {
+						int move_x = 20; // どのくらいの指をx軸にスライドさせたら血が出るかの値
+						if (move_x < -(pos.x - event.x)
+								|| move_x < (pos.x - event.x)) {
 							if (!flag_slide)
 								Assets.voice01.play(1);
 							flag_slide = true;
+							now_pos.x = event.x;
+							now_pos.y = event.y;
 							break;
 						}
 					}
@@ -140,8 +145,8 @@ public class PlayScreen extends Screen {
 					sick.setFlag(true);
 					sick.setXY(event.x, event.y);
 					if (pos.x < 0) {
-						pos.x = event.x;
-						pos.y = event.y;
+						pos.x = now_pos.x = event.x;
+						pos.y = now_pos.y = event.y;
 					}
 					break;
 				}
@@ -170,8 +175,8 @@ public class PlayScreen extends Screen {
 					sick.setFlag(false);
 					sick.setXY(-sick.width, -sick.height);
 				}
-				pos.x = -1;
-				pos.y = -1;
+				pos.x = now_pos.x = -1;
+				pos.y = now_pos.y = -1;
 				flag_slide = false;
 				break;
 			}
@@ -185,11 +190,13 @@ public class PlayScreen extends Screen {
 			if (sprite instanceof Ke) {
 				Ke ke = (Ke) sprite;
 				ke.Update(deltaTime);
-			} else	sprite.Update();
+			} else
+				sprite.Update();
 		}
 		sick.Update();
 		if (sick_no > 0)
 			hps[sick_no - 1] = sick.getHp();
+
 	}
 
 	private void updateGameOver(List<TouchEvent> touchEvents) {
@@ -231,8 +238,6 @@ public class PlayScreen extends Screen {
 		g.drawRect(0, 0, 481, 801, Color.rgb(255, 241, 207));
 		world.draw(g);
 		sick.draw(g, sick_no);
-		if (flag_slide)
-			g.drawRect(100, 100, 100, 100, Color.BLUE);
 
 		LinkedList sprites = world.getSprites();
 		Iterator iterator = sprites.iterator(); // Iterator=コレクション内の要素を順番に取り出す方法
@@ -276,6 +281,21 @@ public class PlayScreen extends Screen {
 		while (iterator.hasNext()) {
 			Sprite sprite = (Sprite) iterator.next();
 			sprite.draw(g);
+		}
+
+		// 出血処理
+		if (flag_slide && sick_no > 0) {
+			Log.d("Draw", "出血" + (150 * (150 / (now_pos.x - pos.x) * 0.01)));
+			Rect src = new Rect(0, 0, 150, 100);
+			Rect dst;
+			if (pos.x < now_pos.x)
+				dst = new Rect((int) pos.x, (int) pos.y, pos.x
+						+ (now_pos.x - pos.x), pos.y + 100);
+			else
+				dst = new Rect((int) now_pos.x, (int) now_pos.y, now_pos.x
+						+ (pos.x - now_pos.x), now_pos.y + 100);
+
+			g.drawPixmap(Assets.image_blood, src, dst);
 		}
 
 		g.drawRect(440, 0, 40, 40, Color.RED, 150);
