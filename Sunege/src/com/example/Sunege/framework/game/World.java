@@ -3,6 +3,7 @@ package com.example.Sunege.framework.game;
 import java.util.LinkedList;
 
 import android.graphics.Color;
+import android.graphics.Point;
 import android.util.Log;
 
 import com.example.Sunege.framework.Graphics;
@@ -21,14 +22,14 @@ public class World {
 	}
 
 	public void load() {
-		for (; sprites.size() < 50;) {
+		for (; sprites.size() < 150;) {
 			sprites.add(new Ke());
 		}
 	}
 
 	public void load(String[][] list, int dif) {
 		int i = 0;
-		for (i = 0; i < list.length && i < 500; i++) {
+		for (i = 0; i < list.length && i < 300; i++) {
 			if (list[i][0] != null) {
 				int level = Integer.parseInt(list[i][2]);
 				level += (int) (dif / Ke.TICK_INITIAL) * 10;
@@ -39,15 +40,6 @@ public class World {
 			}
 		}
 	}
-
-	// public void addSunege(int dif) {
-	// int sum = dif * (int)TICK_INITIAL;
-	// for (; sprites.size() < sum;) {
-	// Ke ke = new Ke();
-	// sprites.add(ke);
-	// ke.setLevel(100);
-	// }
-	// }
 
 	public void addSunege(int dif) {
 		for (int i = 1; true; i++) {
@@ -71,9 +63,9 @@ public class World {
 			sprites.add(new Ke());
 		}
 	}
-
-	public void draw(Graphics g) {
-
+	
+	public boolean addBlood(Point pos) {
+		return 	sprites.add(new Blood(pos));
 	}
 
 	public LinkedList getSprites() {

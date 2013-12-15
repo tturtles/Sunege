@@ -6,12 +6,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import android.R.bool;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.widget.SlidingDrawer;
 
 import com.example.Sunege.framework.Game;
 import com.example.Sunege.framework.Graphics;
@@ -29,19 +31,20 @@ public class PlayScreen extends Screen {
 	private World world;
 	private Sickhydro sick;
 	private int shaved_sum = 0; // 剃った毛の総数
-	private Point pos; // Down時の座標
+	private Point down_Pos; // Down時の座標
 	private Point now_pos;
 	private boolean flag_slide = false; // 横スライド、つまりスネをカミソリで切った場合
 	private int hps[];
 	private int sick_no = 0; // 刃の枚数　1 = 1枚刃
 	private boolean flag_select; // 1本でも毛を選択している状態ならtrue
+	private boolean flag_bloodEdit;
 
 	public PlayScreen(Game game) {
 		super(game);
 		hps = new int[5];
 		long difference;
 		world = new World();
-		pos = new Point(); // [0]=前の位置　[1]=次の位置
+		down_Pos = new Point(); // [0]=前の位置　[1]=次の位置
 		now_pos = new Point();
 		String[][] list = Utils.readSaveData(game.getFileIO());
 		shaved_sum = Integer.parseInt(list[0][0]); // 剃ったすね毛の総数取得
@@ -119,23 +122,32 @@ public class PlayScreen extends Screen {
 					switch (sick_no) {
 					case 0: // 毛を抜く判定（毛抜き時）
 						int move_range = 15; // 毛を選択してどのくらい全方向に指をスライドさせたら抜くかの値
-						if (move_range < -(pos.x - event.x)
-								|| move_range < (pos.x - event.x)
-								|| move_range < -(pos.y - event.y)
-								|| move_range < (pos.y - event.y))
+						if (move_range < -(down_Pos.x - event.x)
+								|| move_range < (down_Pos.x - event.x)
+								|| move_range < -(down_Pos.y - event.y)
+								|| move_range < (down_Pos.y - event.y))
 							flag_slide = true;
+						break;
 
 					default: // カミソリで肌を傷つけた時の判定（カミソリ時）
 						int move_x = 20; // どのくらいの指をx軸にスライドさせたら血が出るかの値
-						if (move_x < -(pos.x - event.x)
-								|| move_x < (pos.x - event.x)) {
-							if (!flag_slide)
-								Assets.voice01.play(1);
-							flag_slide = true;
-							now_pos.x = event.x;
-							now_pos.y = event.y;
-							break;
+						int move_y = 20; // この範囲内のy軸の移動があった場合出血しない
+						now_pos.x = event.x;
+						now_pos.y = event.y;
+						if (move_x < -(down_Pos.x - event.x)
+								|| move_x < (down_Pos.x - event.x)) {
+							if ((down_Pos.y > event.y && move_y > (down_Pos.y - event.y))
+									|| (down_Pos.y < event.y && move_y > -(down_Pos.y - event.y))) {
+								if (!sick.isFlag_end()) {
+									if (!flag_slide)
+										Assets.voice01.play(1);
+									flag_slide = true;
+								}
+							} else {
+								flag_slide = flag_bloodEdit = false;
+							}
 						}
+						break;
 					}
 				}
 
@@ -144,9 +156,9 @@ public class PlayScreen extends Screen {
 						&& isBounds(event, 0, 100, 480, 600)) {
 					sick.setFlag(true);
 					sick.setXY(event.x, event.y);
-					if (pos.x < 0) {
-						pos.x = now_pos.x = event.x;
-						pos.y = now_pos.y = event.y;
+					if (down_Pos.x < 0) {
+						down_Pos.x = now_pos.x = event.x;
+						down_Pos.y = now_pos.y = event.y;
 					}
 					break;
 				}
@@ -175,9 +187,9 @@ public class PlayScreen extends Screen {
 					sick.setFlag(false);
 					sick.setXY(-sick.width, -sick.height);
 				}
-				pos.x = now_pos.x = -1;
-				pos.y = now_pos.y = -1;
-				flag_slide = false;
+				down_Pos.x = now_pos.x = -1;
+				down_Pos.y = now_pos.y = -1;
+				flag_slide = flag_bloodEdit = false;
 				break;
 			}
 		}
@@ -236,8 +248,8 @@ public class PlayScreen extends Screen {
 		// ゲーム中のUI(描画系)
 		Graphics g = game.getGraphics();
 		g.drawRect(0, 0, 481, 801, Color.rgb(255, 241, 207));
-		world.draw(g);
 		sick.draw(g, sick_no);
+		boolean flag_blood = false; // 血を新しく生成するかどうか
 
 		LinkedList sprites = world.getSprites();
 		Iterator iterator = sprites.iterator(); // Iterator=コレクション内の要素を順番に取り出す方法
@@ -248,10 +260,10 @@ public class PlayScreen extends Screen {
 				/********************************** ここから↓　switch分の方がよいかも...(12/12) **********************************/
 				// カミソリ処理
 				if (sick_no > 0) {
-					if (sick.isCollision(sprite) && !sick.getFlag_end()) { // カミソリに毛がぶつかり、カミソリが使えるのなら
+					if (sick.isCollision(sprite) && !sick.isFlag_end()) { // カミソリに毛がぶつかり、カミソリが使えるのなら
 						if (sprites.remove(ke)) {
 							shaved_sum++;
-							sick.setHp();
+							sick.minusHp();
 							break;
 						}
 					}
@@ -259,8 +271,7 @@ public class PlayScreen extends Screen {
 
 				// 毛抜き処理
 				else if (sick_no == 0) {
-					int margin_xy = 0; // タップ範囲
-					if (isBounds(pos, (int) ke.x, (int) ke.y,
+					if (isBounds(down_Pos, (int) ke.x, (int) ke.y,
 							ke.getimage_width(), ke.getimage_height())
 							&& !flag_select) { // すね毛選択処理
 						ke.setFlag_select(true);
@@ -274,7 +285,17 @@ public class PlayScreen extends Screen {
 						}
 					}
 				}
+			} else if (sprite instanceof Blood) {
+				Blood blood = (Blood) sprite;
+				if (flag_bloodEdit && flag_slide && blood.isFlag_edit()
+						&& now_pos.y > 0) {
+					if (!blood.point_Move(now_pos))
+						flag_blood = true;
+				} else if (!flag_bloodEdit && !flag_slide) {
+					blood.setFlag_edit(false);
+				}
 			}
+
 		}
 		/**************************************************** ここまで ****************************************************/
 		iterator = sprites.iterator();
@@ -284,18 +305,10 @@ public class PlayScreen extends Screen {
 		}
 
 		// 出血処理
-		if (flag_slide && sick_no > 0) {
-			Log.d("Draw", "出血" + (150 * (150 / (now_pos.x - pos.x) * 0.01)));
-			Rect src = new Rect(0, 0, 150, 100);
-			Rect dst;
-			if (pos.x < now_pos.x)
-				dst = new Rect((int) pos.x, (int) pos.y, pos.x
-						+ (now_pos.x - pos.x), pos.y + 100);
-			else
-				dst = new Rect((int) now_pos.x, (int) now_pos.y, now_pos.x
-						+ (pos.x - now_pos.x), now_pos.y + 100);
-
-			g.drawPixmap(Assets.image_blood, src, dst);
+		if (flag_slide && sick_no > 0 && !flag_bloodEdit && down_Pos.y > 0) {
+			flag_bloodEdit = world.addBlood(down_Pos);
+		} else if (flag_blood) {
+			flag_bloodEdit = world.addBlood(now_pos);
 		}
 
 		g.drawRect(440, 0, 40, 40, Color.RED, 150);
@@ -305,9 +318,10 @@ public class PlayScreen extends Screen {
 		g.drawTextAlp("すね毛ポイント:", 210, 25, Color.BLACK, 20);
 		g.drawTextAlp("" + shaved_sum, 360, 25, Color.BLACK, 20);
 		g.drawTextAlp("sick_no" + sick_no, 300, 50, Color.BLACK, 20);
-		g.drawTextAlp("flag_select : " + flag_select, 210, 70, Color.BLACK, 20);
-		g.drawTextAlp("pos.x : " + pos.x + "  pos.y : " + pos.y, 210, 90,
-				Color.BLACK, 20);
+		g.drawTextAlp("now.x : " + now_pos.x + "  now.y : " + now_pos.y, 210,
+				70, Color.BLACK, 20);
+		g.drawTextAlp("pos.x : " + down_Pos.x + "  pos.y : " + down_Pos.y, 210,
+				90, Color.BLACK, 20);
 		g.drawLine(0, 700, 480, 700, Color.BLACK, 2);
 		for (int i = 0; i < 5; i++) {
 			g.drawTextAlp((i + 1) + "枚刃", 10 + 80 * (i + 1), 730, Color.BLACK,
@@ -322,7 +336,6 @@ public class PlayScreen extends Screen {
 	private void drawGameOverUI() {
 		// ゲームオーバー時のUI(描画系)
 		Graphics g = game.getGraphics();
-		world.draw(g);
 		Paint paint = new Paint();
 		paint.setColor(Color.RED);
 		paint.setTextSize(100);

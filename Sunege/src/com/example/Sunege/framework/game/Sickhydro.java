@@ -48,11 +48,11 @@ public class Sickhydro extends Sprite {
 		this.y = y - (height / 2);
 	}
 
-	public void setHp() {
+	public void minusHp() {
 		this.hp -= 1;
 	}
 
-	public boolean getFlag_end() {
+	public boolean isFlag_end() {
 		return flag_end;
 	}
 }
