@@ -31,6 +31,7 @@ public class Blood extends Sprite {
 	}
 
 	public boolean point_Move(Point end_pos) {
+		if(!flag_edit) return false;
 		if (end_x == 0 && end_y == 0) {
 			this.end_x = end_pos.x;
 			this.end_y = end_pos.y;
@@ -40,7 +41,6 @@ public class Blood extends Sprite {
 			this.end_y = end_pos.y;
 			return true;
 		} else if (end_x >= end_pos.x && x > end_pos.x) {
-			Log.d("A", "end_MOve");
 			this.end_x = end_pos.x;
 			this.end_y = end_pos.y;
 			return true;
@@ -60,8 +60,6 @@ public class Blood extends Sprite {
 			dst = new Rect((int) end_x, (int) end_y,
 					(int) (end_x + (x - end_x)), (int) (end_y + 100));
 		g.drawPixmap(Assets.image_blood, src, dst);
-		Log.d("start.y", ""+y);
-		Log.d("end.y", ""+end_y);
 	}
 
 	public void setFlag_edit(boolean flag_edit) {

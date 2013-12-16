@@ -37,7 +37,7 @@ public class PlayScreen extends Screen {
 	private int hps[];
 	private int sick_no = 0; // 刃の枚数　1 = 1枚刃
 	private boolean flag_select; // 1本でも毛を選択している状態ならtrue
-	private boolean flag_bloodEdit;
+	private boolean flag_bloodedit = false;	// 血を編集しているかどうか
 
 	public PlayScreen(Game game) {
 		super(game);
@@ -130,8 +130,8 @@ public class PlayScreen extends Screen {
 						break;
 
 					default: // カミソリで肌を傷つけた時の判定（カミソリ時）
-						int move_x = 20; // どのくらいの指をx軸にスライドさせたら血が出るかの値
-						int move_y = 20; // この範囲内のy軸の移動があった場合出血しない
+						int move_x = 10; // どのくらいの指をx軸にスライドさせたら血が出るかの値
+						int move_y = 30; // この範囲内のy軸の移動があった場合出血しない
 						now_pos.x = event.x;
 						now_pos.y = event.y;
 						if (move_x < -(down_Pos.x - event.x)
@@ -141,10 +141,14 @@ public class PlayScreen extends Screen {
 								if (!sick.isFlag_end()) {
 									if (!flag_slide)
 										Assets.voice01.play(1);
-									flag_slide = true;
+									if (!flag_slide && !flag_bloodedit) {
+										world.addBlood(down_Pos);
+										Log.d("血", "作成");
+									}
+									flag_slide = flag_bloodedit = true;
 								}
 							} else {
-								flag_slide = flag_bloodEdit = false;
+								flag_slide = false;
 							}
 						}
 						break;
@@ -189,7 +193,7 @@ public class PlayScreen extends Screen {
 				}
 				down_Pos.x = now_pos.x = -1;
 				down_Pos.y = now_pos.y = -1;
-				flag_slide = flag_bloodEdit = false;
+				flag_slide = flag_bloodedit = false;
 				break;
 			}
 		}
@@ -249,7 +253,7 @@ public class PlayScreen extends Screen {
 		Graphics g = game.getGraphics();
 		g.drawRect(0, 0, 481, 801, Color.rgb(255, 241, 207));
 		sick.draw(g, sick_no);
-		boolean flag_blood = false; // 血を新しく生成するかどうか
+		boolean flag = false; // 血を新しく生成するかどうか
 
 		LinkedList sprites = world.getSprites();
 		Iterator iterator = sprites.iterator(); // Iterator=コレクション内の要素を順番に取り出す方法
@@ -287,12 +291,10 @@ public class PlayScreen extends Screen {
 				}
 			} else if (sprite instanceof Blood) {
 				Blood blood = (Blood) sprite;
-				if (flag_bloodEdit && flag_slide && blood.isFlag_edit()
-						&& now_pos.y > 0) {
-					if (!blood.point_Move(now_pos))
-						flag_blood = true;
-				} else if (!flag_bloodEdit && !flag_slide) {
+				if (!flag_bloodedit)
 					blood.setFlag_edit(false);
+				if (flag_slide && blood.isFlag_edit()) {
+					flag = !blood.point_Move(now_pos);
 				}
 			}
 
@@ -304,11 +306,9 @@ public class PlayScreen extends Screen {
 			sprite.draw(g);
 		}
 
-		// 出血処理
-		if (flag_slide && sick_no > 0 && !flag_bloodEdit && down_Pos.y > 0) {
-			flag_bloodEdit = world.addBlood(down_Pos);
-		} else if (flag_blood) {
-			flag_bloodEdit = world.addBlood(now_pos);
+		if (flag_slide && sick_no > 0 && flag) { // 往復スライド時の出血
+			if (world.addBlood(now_pos))
+				down_Pos = now_pos;
 		}
 
 		g.drawRect(440, 0, 40, 40, Color.RED, 150);
@@ -322,6 +322,8 @@ public class PlayScreen extends Screen {
 				70, Color.BLACK, 20);
 		g.drawTextAlp("pos.x : " + down_Pos.x + "  pos.y : " + down_Pos.y, 210,
 				90, Color.BLACK, 20);
+		g.drawTextAlp("flag_bloodedit : " + flag_bloodedit, 210, 110,
+				Color.BLACK, 20);
 		g.drawLine(0, 700, 480, 700, Color.BLACK, 2);
 		for (int i = 0; i < 5; i++) {
 			g.drawTextAlp((i + 1) + "枚刃", 10 + 80 * (i + 1), 730, Color.BLACK,
