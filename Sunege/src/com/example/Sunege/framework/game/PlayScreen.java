@@ -37,7 +37,7 @@ public class PlayScreen extends Screen {
 	private int hps[];
 	private int sick_no = 0; // 刃の枚数　1 = 1枚刃
 	private boolean flag_select; // 1本でも毛を選択している状態ならtrue
-	private boolean flag_bloodedit = false;	// 血を編集しているかどうか
+	private boolean flag_bloodedit = false; // 血を編集しているかどうか
 
 	public PlayScreen(Game game) {
 		super(game);
@@ -143,7 +143,6 @@ public class PlayScreen extends Screen {
 										Assets.voice01.play(1);
 									if (!flag_slide && !flag_bloodedit) {
 										world.addBlood(down_Pos);
-										Log.d("血", "作成");
 									}
 									flag_slide = flag_bloodedit = true;
 								}
@@ -206,8 +205,11 @@ public class PlayScreen extends Screen {
 			if (sprite instanceof Ke) {
 				Ke ke = (Ke) sprite;
 				ke.Update(deltaTime);
-			} else
-				sprite.Update();
+			} else if (sprite instanceof Blood) {
+				Blood blood = (Blood) sprite;
+				blood.Update(deltaTime);
+			}
+			sprite.Update();
 		}
 		sick.Update();
 		if (sick_no > 0)
@@ -307,8 +309,8 @@ public class PlayScreen extends Screen {
 		}
 
 		if (flag_slide && sick_no > 0 && flag) { // 往復スライド時の出血
-			if (world.addBlood(now_pos))
-				down_Pos = now_pos;
+			world.addBlood(now_pos);
+			down_Pos = now_pos;
 		}
 
 		g.drawRect(440, 0, 40, 40, Color.RED, 150);

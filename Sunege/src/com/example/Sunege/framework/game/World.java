@@ -64,8 +64,8 @@ public class World {
 		}
 	}
 	
-	public boolean addBlood(Point pos) {
-		return 	sprites.add(new Blood(pos));
+	public void addBlood(Point pos) {
+		sprites.addFirst(new Blood(pos));
 	}
 
 	public LinkedList getSprites() {
