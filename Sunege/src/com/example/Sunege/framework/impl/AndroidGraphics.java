@@ -7,10 +7,6 @@ import com.example.Sunege.framework.Graphics;
 import com.example.Sunege.framework.Pixmap;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -18,16 +14,10 @@ import android.graphics.BitmapFactory.Options;
 import android.graphics.Paint.Style;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.TextView;
 
 public class AndroidGraphics extends Activity implements Graphics {
 	AssetManager assets;
@@ -145,47 +135,40 @@ public class AndroidGraphics extends Activity implements Graphics {
 		canvas.drawBitmap(((AndroidPixmap) pixmap).bitmap, src, dst, paint);
 	}
 
+	public void drawPixmap(Pixmap pixmap, Rect src, Rect dst, int alpha) {
+		paint.setAlpha(alpha);
+		canvas.drawBitmap(((AndroidPixmap) pixmap).bitmap, src, dst, paint);
+	}
+
+	public void drawPixmapTurn(Pixmap pixmap, Rect src, Rect dst,
+			float width_mag, float height_mag, int angle) {
+		// 画像が回転するロジック
+		Matrix mtx = new Matrix();
+		mtx.postRotate(angle);
+		 mtx.postTranslate(dst.left, dst.top);
+		 mtx.postTranslate(dst.width() / 2, dst.height() / 2);
+		mtx.postScale(width_mag, height_mag);
+		Bitmap bitmap = Bitmap.createBitmap(((AndroidPixmap) pixmap).bitmap, 0,
+				0, ((AndroidPixmap) pixmap).bitmap.getWidth(),
+				((AndroidPixmap) pixmap).bitmap.getHeight(), mtx, true);
+		canvas.drawBitmap(bitmap, dst.left, dst.top, null);
+	}
+
+	public void drawPixmapTurn(Pixmap pixmap, int x, int y, int angle) {
+		// 画像が回転するロジック
+		Matrix mtx = new Matrix();
+		mtx.postRotate(angle);
+		mtx.postTranslate(x, y);
+		mtx.postTranslate(100 / 2, 150 / 2);
+		canvas.drawBitmap(((AndroidPixmap) pixmap).bitmap, mtx, null);
+	}
+
 	public int getWidth() {
 		return frameBuffer.getWidth();
 	}
 
 	public int getHeight() {
 		return frameBuffer.getHeight();
-	}
-
-	@Override
-	public void drawController(int cx, int cy, int cr, Paint circle_paint,
-			int color, int color2, int direction) {
-		int cw = 70;
-		canvas.drawCircle(cx, cy, cr, circle_paint);
-		switch (direction) {
-		case 1:
-			Arrow(cx + cr, cy, cx + cr - cw, cy - cw / 2, cx + cr - cw, cy + cw
-					/ 2, color2); // right
-			Arrow(cx - cr, cy, cx - cr + cw, cy - cw / 2, cx - cr + cw, cy + cw
-					/ 2, color); // left
-			break;
-
-		case 2:
-			Arrow(cx - cr, cy, cx - cr + cw, cy - cw / 2, cx - cr + cw, cy + cw
-					/ 2, color2); // left
-			Arrow(cx + cr, cy, cx + cr - cw, cy - cw / 2, cx + cr - cw, cy + cw
-					/ 2, color); // right
-			break;
-		default:
-			Arrow(cx + cr, cy, cx + cr - cw, cy - cw / 2, cx + cr - cw, cy + cw
-					/ 2, color); // right
-			Arrow(cx - cr, cy, cx - cr + cw, cy - cw / 2, cx - cr + cw, cy + cw
-					/ 2, color); // left
-			break;
-		}
-		paint.setColor(color);
-		Path path = new Path();
-		canvas.drawPath(path, paint);
-	}
-
-	public void drawCircle(int cx, int cy, int cr, Paint circle_paint) {
-		canvas.drawCircle(cx, cy, cr, circle_paint);
 	}
 
 	public void drawTextAlp(String line, float x, float y, Paint paint) {
@@ -197,17 +180,6 @@ public class AndroidGraphics extends Activity implements Graphics {
 		paint.setColor(color);
 		paint.setTextSize(size);
 		canvas.drawText(line, x, y, paint);
-	}
-
-	private void Arrow(float x1, float y1, float x2, float y2, float x3,
-			float y3, int color) {
-		Paint paint = new Paint();
-		paint.setColor(color);
-		Path path = new Path();
-		path.moveTo(x1, y1);
-		path.lineTo(x2, y2);
-		path.lineTo(x3, y3);
-		canvas.drawPath(path, paint);
 	}
 
 }

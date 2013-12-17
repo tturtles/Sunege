@@ -3,6 +3,7 @@ package com.example.Sunege.framework.game;
 import java.util.Random;
 
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 
@@ -23,6 +24,7 @@ public class Ke extends Sprite {
 	private boolean flag_select = false;
 	private int move_x = 0;
 	private int move_y = 0;
+	protected int angle = 10;
 
 	public Ke() {
 		this.image = Assets.image_ke;
@@ -67,9 +69,12 @@ public class Ke extends Sprite {
 		Rect src = new Rect(0, 0, image_width, image_height);
 		Rect dst = new Rect((int) x, (int) y, (int) x + image_width,
 				(int) (y + (image_height * (level * 0.01))));
-		g.drawPixmap(Assets.image_ke, src, dst);
-		// g.drawTextAlp("" level, (float)x, (float)y, Color.RED, 15);
-		// レベル表示
+		if (flag_select)
+			g.drawPixmapTurn(Assets.image_ke, src, dst, 1,
+					(float) (level * 0.01), angle);
+		else
+			g.drawPixmap(Assets.image_ke, src, dst);
+//		g.drawRect((int)x, (int)y, 2, 2, Color.RED);
 	}
 
 	public void moveKe(int move_x, int move_y) {
@@ -97,4 +102,14 @@ public class Ke extends Sprite {
 		return flag_select;
 	}
 
+	public void setAngle(Point now_point) {
+		if(!flag_select) return;
+		int r = 10;
+		float center_x = (float)(x+image_width/2);
+		x += center_x;
+//		float center_y = (float)(y+image_height/2);
+		double degree = Math.cos(Math.PI*r)/180*now_point.x;
+//		angle = (int)degree;
+	}
+	
 }

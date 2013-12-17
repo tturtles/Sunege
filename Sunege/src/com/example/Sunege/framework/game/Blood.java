@@ -29,7 +29,7 @@ public class Blood extends Sprite {
 		tickTime += deltaTime;
 		while (tickTime > tick) {
 			tickTime -= tick;
-			if ((y + (100 * (level * 0.01)))<700)
+			if ((y + (100 * (level * 0.01))) < 700)
 				level += ADD_LEVEL;
 		}
 	}
@@ -56,6 +56,7 @@ public class Blood extends Sprite {
 	}
 
 	public void draw(Graphics g) {
+		int alpha = 255; // 画像の濃さ
 		Rect src = new Rect(0, 0, 150, 100);
 		Rect dst;
 		if (x < end_x)
@@ -63,8 +64,9 @@ public class Blood extends Sprite {
 					(int) (y + (100 * (level * 0.01))));
 		else
 			dst = new Rect((int) end_x, (int) end_y,
-					(int) (end_x + (x - end_x)), 	(int) (end_y + (100 * (level * 0.01))));
-		g.drawPixmap(Assets.image_blood, src, dst);
+					(int) (end_x + (x - end_x)),
+					(int) (end_y + (100 * (level * 0.01))));
+		g.drawPixmap(Assets.image_blood, src, dst, alpha);
 	}
 
 	public void setFlag_edit(boolean flag_edit) {

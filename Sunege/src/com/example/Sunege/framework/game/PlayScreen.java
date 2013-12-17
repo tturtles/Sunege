@@ -205,6 +205,7 @@ public class PlayScreen extends Screen {
 			if (sprite instanceof Ke) {
 				Ke ke = (Ke) sprite;
 				ke.Update(deltaTime);
+				ke.setAngle(now_pos);
 			} else if (sprite instanceof Blood) {
 				Blood blood = (Blood) sprite;
 				blood.Update(deltaTime);
