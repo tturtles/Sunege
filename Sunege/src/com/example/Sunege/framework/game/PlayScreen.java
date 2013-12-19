@@ -205,7 +205,7 @@ public class PlayScreen extends Screen {
 			if (sprite instanceof Ke) {
 				Ke ke = (Ke) sprite;
 				ke.Update(deltaTime);
-				ke.setAngle(now_pos);
+				// ke.setAngle(now_pos);
 			} else if (sprite instanceof Blood) {
 				Blood blood = (Blood) sprite;
 				blood.Update(deltaTime);
@@ -278,13 +278,16 @@ public class PlayScreen extends Screen {
 
 				// 毛抜き処理
 				else if (sick_no == 0) {
+					// 毛の選択処理
 					if (isBounds(down_Pos, (int) ke.x, (int) ke.y,
 							ke.getimage_width(), ke.getimage_height())
 							&& !flag_select) { // すね毛選択処理
 						ke.setFlag_select(true);
 						flag_select = true;
 						break;
-					} else if (flag_slide && ke.isFlag_select()) { // すね毛を剃る処理
+
+						// すね毛を抜く処理
+					} else if (flag_slide && ke.isFlag_select()) {
 						if (sprites.remove(ke)) {
 							shaved_sum++;
 							flag_select = false;
@@ -292,6 +295,8 @@ public class PlayScreen extends Screen {
 						}
 					}
 				}
+
+				// 出血処理
 			} else if (sprite instanceof Blood) {
 				Blood blood = (Blood) sprite;
 				if (!flag_bloodedit)
@@ -335,7 +340,7 @@ public class PlayScreen extends Screen {
 			g.drawLine(80 * (i + 1), 700, 80 * (i + 1), 800, Color.BLACK, 2);
 		}
 		g.drawTextAlp("毛抜き", 10, 730, Color.BLACK, 20);
-		g.drawRect((sick_no * 80) + 1, 701, 78, 100, Color.BLUE, 125);
+		g.drawRect((sick_no * 81) + 1, 701, 78, 100, Color.BLUE, 125);
 	}
 
 	private void drawGameOverUI() {

@@ -69,12 +69,12 @@ public class Ke extends Sprite {
 		Rect src = new Rect(0, 0, image_width, image_height);
 		Rect dst = new Rect((int) x, (int) y, (int) x + image_width,
 				(int) (y + (image_height * (level * 0.01))));
-		if (flag_select)
-			g.drawPixmapTurn(Assets.image_ke, src, dst, 1,
-					(float) (level * 0.01), angle);
-		else
-			g.drawPixmap(Assets.image_ke, src, dst);
-//		g.drawRect((int)x, (int)y, 2, 2, Color.RED);
+		// if (flag_select)
+		// g.drawPixmapTurn(Assets.image_ke, src, dst, 1,
+		// (float) (level * 0.01), angle);
+		// else
+		g.drawPixmap(Assets.image_ke, src, dst);
+		// g.drawRect((int)x, (int)y, 2, 2, Color.RED);
 	}
 
 	public void moveKe(int move_x, int move_y) {
@@ -103,13 +103,14 @@ public class Ke extends Sprite {
 	}
 
 	public void setAngle(Point now_point) {
-		if(!flag_select) return;
+		if (!flag_select)
+			return;
 		int r = 10;
-		float center_x = (float)(x+image_width/2);
+		float center_x = (float) (x + image_width / 2);
 		x += center_x;
-//		float center_y = (float)(y+image_height/2);
-		double degree = Math.cos(Math.PI*r)/180*now_point.x;
-//		angle = (int)degree;
+		// float center_y = (float)(y+image_height/2);
+		double degree = Math.cos(Math.PI * r) / 180 * now_point.x;
+		angle = (int) degree;
 	}
-	
+
 }
