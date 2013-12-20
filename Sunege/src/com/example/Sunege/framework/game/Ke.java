@@ -24,7 +24,7 @@ public class Ke extends Sprite {
 	private boolean flag_select = false;
 	private int move_x = 0;
 	private int move_y = 0;
-	protected int angle = 10;
+	protected int angle = 0;
 
 	public Ke() {
 		this.image = Assets.image_ke;
@@ -63,17 +63,20 @@ public class Ke extends Sprite {
 		}
 		this.x += move_x;
 		this.y += move_y;
+//		angle = angle > 360 ? 0 : angle + 5;
 	}
 
 	public void draw(Graphics g) {
 		Rect src = new Rect(0, 0, image_width, image_height);
 		Rect dst = new Rect((int) x, (int) y, (int) x + image_width,
 				(int) (y + (image_height * (level * 0.01))));
-		// if (flag_select)
+//		if (flag_select)
+//			g.drawPixmapTurn(Assets.imagel_ke, src, dst, 1, 1, angle);
+//		else
+			g.drawPixmap(Assets.image_ke, src, dst);
+		
 		// g.drawPixmapTurn(Assets.image_ke, src, dst, 1,
 		// (float) (level * 0.01), angle);
-		// else
-		g.drawPixmap(Assets.image_ke, src, dst);
 		// g.drawRect((int)x, (int)y, 2, 2, Color.RED);
 	}
 

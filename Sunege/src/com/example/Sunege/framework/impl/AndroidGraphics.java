@@ -145,8 +145,8 @@ public class AndroidGraphics extends Activity implements Graphics {
 		// 画像が回転するロジック
 		Matrix mtx = new Matrix();
 		mtx.postRotate(angle);
-		mtx.postTranslate(dst.left, dst.top);
-		mtx.postTranslate(dst.width() / 2, dst.height() / 2);
+//		mtx.postTranslate(dst.left, dst.top);
+		mtx.postTranslate(dst.width() / 2, dst.left);
 		mtx.postScale(width_mag, height_mag);
 		Bitmap bitmap = Bitmap.createBitmap(((AndroidPixmap) pixmap).bitmap, 0,
 				0, ((AndroidPixmap) pixmap).bitmap.getWidth(),

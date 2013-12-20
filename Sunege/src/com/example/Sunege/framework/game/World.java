@@ -29,7 +29,7 @@ public class World {
 
 	public void load(String[][] list, int dif) {
 		int i = 0;
-		for (i = 0; i < list.length && i < 300; i++) {
+		for (i = 0; i < list.length && i < 100; i++) {
 			if (list[i][0] != null) {
 				int level = Integer.parseInt(list[i][2]);
 				level += (int) (dif / Ke.TICK_INITIAL) * 10;
