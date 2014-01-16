@@ -38,6 +38,8 @@ public class PlayScreen extends Screen {
 	private int sick_no = 0; // 刃の枚数　1 = 1枚刃
 	private boolean flag_select; // 1本でも毛を選択している状態ならtrue
 	private boolean flag_bloodedit = false; // 血を編集しているかどうか
+	private boolean flag_Nobuy; // カミソリが買えない時はtrue,買える時はfalse
+	private int[] minuss = { 1, 5, 10, 15, 30 }; // 剃れる度合い
 
 	public PlayScreen(Game game) {
 		super(game);
@@ -48,6 +50,7 @@ public class PlayScreen extends Screen {
 		now_pos = new Point();
 		String[][] list = Utils.readSaveData(game.getFileIO());
 		shaved_sum = Integer.parseInt(list[0][0]); // 剃ったすね毛の総数取得
+		// shaved_sum = 1000000000; // 剃ったすね毛の総数取得
 		for (int i = 0; i < 5; i++)
 			// 前回よりの経過時間の取得
 			hps[i] = Integer.parseInt(list[0][i + 2]);
@@ -82,33 +85,46 @@ public class PlayScreen extends Screen {
 			updateItemSelect(touchEvents, deltaTime);
 		if (state == GameState.Playing)
 			updatePlaying(touchEvents, deltaTime);
-		if (state == GameState.GameOver) {
+		if (state == GameState.GameOver)
 			updateGameOver(touchEvents);
-		}
 	}
 
 	private void updateItemSelect(List<TouchEvent> touchEvents, float deltaTime) {
 		// ItemSelectScreenのタッチ処理書き込み
 		int len = touchEvents.size();
+		int select = -1; // 選択されない間は-1
+		int[] sick_hps = { 100, 200, 300, 400, 500 }; // 剃れる毛の量の初期値
+		int[] minus_points = { 50, 100, 200, 300, 400 }; // 消費するすね毛ポイント数
 		for (int i = 0; i < len; i++) {
 			TouchEvent event = touchEvents.get(i);
 			switch (event.type) {
 			case MotionEvent.ACTION_UP:
-				if (isBounds(event, 0, 750, 480, 800))
-					state = GameState.Playing;
-				if (isBounds(event, 0, 170, 480, 100))
-					hps[0] = 100;
-				if (isBounds(event, 0, 270, 480, 100))
-					hps[1] = 200;
-				if (isBounds(event, 0, 370, 480, 100))
-					hps[2] = 300;
-				if (isBounds(event, 0, 470, 480, 100))
-					hps[3] = 400;
-				if (isBounds(event, 0, 570, 480, 100))
-					hps[4] = 500;
-				return;
+				if (!flag_Nobuy) {
+					if (isBounds(event, 0, 750, 480, 800))
+						state = GameState.Playing;
+					if (isBounds(event, 0, 170, 480, 100))
+						select = 0;
+					if (isBounds(event, 0, 270, 480, 100))
+						select = 1;
+					if (isBounds(event, 0, 370, 480, 100))
+						select = 2;
+					if (isBounds(event, 0, 470, 480, 100))
+						select = 3;
+					if (isBounds(event, 0, 570, 480, 100))
+						select = 4;
+				} else if (isBounds(event, 410, 240, 50, 50))
+					flag_Nobuy = false;
 			}
 		}
+
+		if (select > -1 && shaved_sum - minus_points[select] > 0) { // もし購入できた場合
+			flag_Nobuy = false;
+			shaved_sum -= minus_points[select];
+			hps[select] = sick_hps[select];
+		} else if (select > -1) { // もし購入できなかった場合
+			flag_Nobuy = true;
+		}
+
 	}
 
 	private void updatePlaying(List<TouchEvent> touchEvents, float deltaTime) {
@@ -249,6 +265,13 @@ public class PlayScreen extends Screen {
 			g.drawTextAlp("" + (i + 1), 230, (i * 100) + 230, Color.WHITE, 40);
 		}
 		g.drawRect(0, 750, 480, 800, Color.WHITE, 255);
+		if (flag_Nobuy) { // 「購入できない」というポップがあるとき
+			g.drawRect(30, 250, 420, 200, Color.WHITE);
+			g.drawTextAlp("ポイントが足りないため", 70, 320, Color.BLACK, 30);
+			g.drawTextAlp("購入できません", 130, 370, Color.BLACK, 30);
+			g.drawTextAlp("✖", 420, 285, Color.BLACK, 50);
+			// g.drawRect(410, 240, 50, 50, Color.BLUE, 125);
+		}
 	}
 
 	private void drawPlayingUI() {
@@ -268,7 +291,9 @@ public class PlayScreen extends Screen {
 				// カミソリ処理
 				if (sick_no > 0) {
 					if (sick.isCollision(sprite) && !sick.isFlag_end()) { // カミソリに毛がぶつかり、カミソリが使えるのなら
-						if (sprites.remove(ke)) {
+						if (sick_no != 0)
+							ke.minusHp(minuss[sick_no - 1]);
+						if (!ke.isAbnum() && sprites.remove(ke)) {
 							shaved_sum++;
 							sick.minusHp();
 							break;

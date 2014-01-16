@@ -42,6 +42,7 @@ public class World {
 	}
 
 	public void addSunege(int dif) {
+		dif = dif > 150 ? 150 : dif;
 		for (int i = 1; true; i++) {
 			int w_dif = dif;
 			w_dif -= TICK_INITIAL * i;
@@ -63,7 +64,7 @@ public class World {
 			sprites.add(new Ke());
 		}
 	}
-	
+
 	public void addBlood(Point pos) {
 		sprites.addFirst(new Blood(pos));
 	}

@@ -27,7 +27,7 @@ public class Utils {
 			sql[0] = "create table SaveData("
 					+ "_id integer primary key autoincrement,"
 					+ "sum integer default 0," + "loves integer default 0,"
-					+ "sick1 integer default 300," + "sick2 integer default 0,"
+					+ "sick1 integer default 0," + "sick2 integer default 0,"
 					+ "sick3 integer default 0," + "sick4 integer default 0,"
 					+ "sick5 integer default 0," + "times long)";
 
@@ -38,7 +38,7 @@ public class Utils {
 					+ "times long)";
 
 			if (files.CreateDBandTable(sql))
-				addSaveData(files, 0, 0, 300, 0, 0, 0, 0,
+				addSaveData(files, 0, 0, 0, 0, 0, 0, 0,
 						System.currentTimeMillis());
 		} catch (Exception e) {
 			// デフォルト設定があるのでエラーは無視
@@ -81,7 +81,7 @@ public class Utils {
 				"sick4", "sick5", "times" };
 		String order = "times desc";
 		// String order = null;
-		return files.readFile("SaveData",columns, null, null, order, 1);
+		return files.readFile("SaveData", columns, null, null, order, 1);
 	}
 
 	public static String[][] readSunegeData(FileIO files) {

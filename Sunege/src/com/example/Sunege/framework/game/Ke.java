@@ -25,6 +25,7 @@ public class Ke extends Sprite {
 	private int move_x = 0;
 	private int move_y = 0;
 	protected int angle = 0;
+	private int hp = 30;
 
 	public Ke() {
 		this.image = Assets.image_ke;
@@ -63,18 +64,18 @@ public class Ke extends Sprite {
 		}
 		this.x += move_x;
 		this.y += move_y;
-//		angle = angle > 360 ? 0 : angle + 5;
+		// angle = angle > 360 ? 0 : angle + 5;
 	}
 
 	public void draw(Graphics g) {
 		Rect src = new Rect(0, 0, image_width, image_height);
 		Rect dst = new Rect((int) x, (int) y, (int) x + image_width,
 				(int) (y + (image_height * (level * 0.01))));
-//		if (flag_select)
-//			g.drawPixmapTurn(Assets.imagel_ke, src, dst, 1, 1, angle);
-//		else
-			g.drawPixmap(Assets.image_ke, src, dst);
-		
+		// if (flag_select)
+		// g.drawPixmapTurn(Assets.imagel_ke, src, dst, 1, 1, angle);
+		// else
+		g.drawPixmap(Assets.image_ke, src, dst);
+
 		// g.drawPixmapTurn(Assets.image_ke, src, dst, 1,
 		// (float) (level * 0.01), angle);
 		// g.drawRect((int)x, (int)y, 2, 2, Color.RED);
@@ -114,6 +115,14 @@ public class Ke extends Sprite {
 		// float center_y = (float)(y+image_height/2);
 		double degree = Math.cos(Math.PI * r) / 180 * now_point.x;
 		angle = (int) degree;
+	}
+
+	public boolean isAbnum() {
+		return hp > 0 ? true : false;
+	}
+
+	public void minusHp(int minus) {
+		hp -= minus;
 	}
 
 }
