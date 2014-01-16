@@ -13,6 +13,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.widget.SlidingDrawer;
 
 import com.example.Sunege.framework.Game;
@@ -21,51 +22,39 @@ import com.example.Sunege.framework.Screen;
 import com.example.Sunege.framework.Input.TouchEvent;
 
 public class PlayScreen extends Screen {
-
-	enum GameState {
-		ItemSelecting, Playing, Paused, GameOver
-	}
-
-	GameState state = GameState.Playing;
-
+	
 	private World world;
 	private Sickhydro sick;
-	private int shaved_sum = 0; // 剃った毛の総数
+	private User user;
 	private Point down_Pos; // Down時の座標
 	private Point now_pos;
 	private boolean flag_slide = false; // 横スライド、つまりスネをカミソリで切った場合
-	private int hps[];
-	private int sick_no = 0; // 刃の枚数　1 = 1枚刃
 	private boolean flag_select; // 1本でも毛を選択している状態ならtrue
 	private boolean flag_bloodedit = false; // 血を編集しているかどうか
-	private boolean flag_Nobuy; // カミソリが買えない時はtrue,買える時はfalse
-	private int[] minuss = { 1, 5, 10, 15, 30 }; // 剃れる度合い
 
 	public PlayScreen(Game game) {
 		super(game);
-		hps = new int[5];
-		long difference;
 		world = new World();
+		user = new User(game);
 		down_Pos = new Point(); // [0]=前の位置　[1]=次の位置
 		now_pos = new Point();
-		String[][] list = Utils.readSaveData(game.getFileIO());
-		shaved_sum = Integer.parseInt(list[0][0]); // 剃ったすね毛の総数取得
-		// shaved_sum = 1000000000; // 剃ったすね毛の総数取得
-		for (int i = 0; i < 5; i++)
-			// 前回よりの経過時間の取得
-			hps[i] = Integer.parseInt(list[0][i + 2]);
-		difference = (System.currentTimeMillis()) - Long.parseLong(list[0][7]);
-		if (shaved_sum == 0)
+		if (user.getShaved_sum() == 0)
 			world.load();
 		else
 			world.load(Utils.readSunegeData(game.getFileIO()),
-					(int) difference / 1000);
-		world.addSunege((int) difference / 1000); // 1秒単位にして渡す
-		for (int i = 0; i < hps.length; i++)
-			// 各カミソリのＨＰを取得
-			hps[i] = Integer.parseInt(list[0][i + 2]);
+					(int) user.getDifference() / 1000);
+		world.addSunege((int) user.getDifference() / 1000); // 1秒単位にして渡す
 		sick = new Sickhydro(0);
-		TimeLog(list, difference);
+	}
+
+	public PlayScreen(Game game, World world, User user) {
+		super(game);
+		this.world = world;
+		this.user = user;
+		sick = new Sickhydro(0);
+		down_Pos = new Point(); // [0]=前の位置　[1]=次の位置
+		now_pos = new Point();
+
 	}
 
 	private void TimeLog(String[][] list, long difference) {
@@ -79,63 +68,16 @@ public class PlayScreen extends Screen {
 
 	@Override
 	public void update(float deltaTime) {
+		// ゲーム中のタッチ処理書き込み
 		List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
 		game.getInput().getKeyEvents();
-		if (state == GameState.ItemSelecting)
-			updateItemSelect(touchEvents, deltaTime);
-		if (state == GameState.Playing)
-			updatePlaying(touchEvents, deltaTime);
-		if (state == GameState.GameOver)
-			updateGameOver(touchEvents);
-	}
-
-	private void updateItemSelect(List<TouchEvent> touchEvents, float deltaTime) {
-		// ItemSelectScreenのタッチ処理書き込み
-		int len = touchEvents.size();
-		int select = -1; // 選択されない間は-1
-		int[] sick_hps = { 100, 200, 300, 400, 500 }; // 剃れる毛の量の初期値
-		int[] minus_points = { 50, 100, 200, 300, 400 }; // 消費するすね毛ポイント数
-		for (int i = 0; i < len; i++) {
-			TouchEvent event = touchEvents.get(i);
-			switch (event.type) {
-			case MotionEvent.ACTION_UP:
-				if (!flag_Nobuy) {
-					if (isBounds(event, 0, 750, 480, 800))
-						state = GameState.Playing;
-					if (isBounds(event, 0, 170, 480, 100))
-						select = 0;
-					if (isBounds(event, 0, 270, 480, 100))
-						select = 1;
-					if (isBounds(event, 0, 370, 480, 100))
-						select = 2;
-					if (isBounds(event, 0, 470, 480, 100))
-						select = 3;
-					if (isBounds(event, 0, 570, 480, 100))
-						select = 4;
-				} else if (isBounds(event, 410, 240, 50, 50))
-					flag_Nobuy = false;
-			}
-		}
-
-		if (select > -1 && shaved_sum - minus_points[select] > 0) { // もし購入できた場合
-			flag_Nobuy = false;
-			shaved_sum -= minus_points[select];
-			hps[select] = sick_hps[select];
-		} else if (select > -1) { // もし購入できなかった場合
-			flag_Nobuy = true;
-		}
-
-	}
-
-	private void updatePlaying(List<TouchEvent> touchEvents, float deltaTime) {
-		// ゲーム中のタッチ処理書き込み
 		int len = touchEvents.size();
 		for (int i = 0; i < len; i++) {
 			TouchEvent event = touchEvents.get(i);
 			switch (event.type) {
 			case MotionEvent.ACTION_MOVE:
 				if (event.y > 100 && event.y < 700) {
-					switch (sick_no) {
+					switch (user.getSick_no()) {
 					case 0: // 毛を抜く判定（毛抜き時）
 						int move_range = 15; // 毛を選択してどのくらい全方向に指をスライドさせたら抜くかの値
 						if (move_range < -(down_Pos.x - event.x)
@@ -184,24 +126,26 @@ public class PlayScreen extends Screen {
 
 			case MotionEvent.ACTION_UP:
 				if (isBounds(event, 0, 0, 200, 100))
-					state = GameState.ItemSelecting;
+					game.setScreen(new ItemSelectScreen(game, world, user));
 				else if (isBounds(event, 440, 0, 40, 40))
 					world.load();
 				else if (isBounds(event, 0, 700, 480, 100)) {
 					if (isBounds(event, 0, 700, 80, 100))
-						sick_no = 0;
+						user.setSick_no(0);
 					else if (isBounds(event, 80, 700, 80, 100))
-						sick_no = 1;
+						user.setSick_no(1);
 					else if (isBounds(event, 160, 700, 80, 100))
-						sick_no = 2;
+						user.setSick_no(2);
 					else if (isBounds(event, 240, 700, 80, 100))
-						sick_no = 3;
+						user.setSick_no(3);
 					else if (isBounds(event, 320, 700, 80, 100))
-						sick_no = 4;
+						user.setSick_no(4);
 					else if (isBounds(event, 400, 700, 80, 100))
-						sick_no = 5;
-					sick = new Sickhydro(sick_no > 0 ? hps[sick_no - 1] : 0);
-					flag_select = sick_no > 0 ? false : flag_select;
+						user.setSick_no(5);
+					sick = new Sickhydro(
+							user.getSick_no() > 0 ? user.getHp(user
+									.getSick_no() - 1) : 0);
+					flag_select = user.getSick_no() > 0 ? false : flag_select;
 				} else {
 					sick.setFlag(false);
 					sick.setXY(-sick.width, -sick.height);
@@ -229,56 +173,15 @@ public class PlayScreen extends Screen {
 			sprite.Update();
 		}
 		sick.Update();
-		if (sick_no > 0)
-			hps[sick_no - 1] = sick.getHp();
-
-	}
-
-	private void updateGameOver(List<TouchEvent> touchEvents) {
-		int len = touchEvents.size();
-		for (int i = 0; i < len; i++) {
-			TouchEvent event = touchEvents.get(i);
-			switch (event.type) {
-			case MotionEvent.ACTION_DOWN:
-				break;
-			}
-		}
+		if (user.getSick_no() > 0)
+			user.setHp(user.getSick_no() - 1, sick.getHp());
 	}
 
 	@Override
 	public void present(float deltaTime) {
-		if (state == GameState.ItemSelecting)
-			drawItemSelectUI();
-		if (state == GameState.Playing)
-			drawPlayingUI();
-		if (state == GameState.GameOver)
-			drawGameOverUI();
-	}
-
-	private void drawItemSelectUI() {
-		// ItemSelect時のUI(描画系)
-		Graphics g = game.getGraphics();
-		g.drawRect(0, 0, 481, 801, Color.BLACK);
-		g.drawTextAlp("ItemSelectScreen", 50, 100, Color.RED, 50);
-		for (int i = 0; i < 5; i++) {
-			g.drawRect(0, (i * 100) + 170, 480, 100, Color.RED);
-			g.drawTextAlp("" + (i + 1), 230, (i * 100) + 230, Color.WHITE, 40);
-		}
-		g.drawRect(0, 750, 480, 800, Color.WHITE, 255);
-		if (flag_Nobuy) { // 「購入できない」というポップがあるとき
-			g.drawRect(30, 250, 420, 200, Color.WHITE);
-			g.drawTextAlp("ポイントが足りないため", 70, 320, Color.BLACK, 30);
-			g.drawTextAlp("購入できません", 130, 370, Color.BLACK, 30);
-			g.drawTextAlp("✖", 420, 285, Color.BLACK, 50);
-			// g.drawRect(410, 240, 50, 50, Color.BLUE, 125);
-		}
-	}
-
-	private void drawPlayingUI() {
-		// ゲーム中のUI(描画系)
 		Graphics g = game.getGraphics();
 		g.drawRect(0, 0, 481, 801, Color.rgb(255, 241, 207));
-		sick.draw(g, sick_no);
+		sick.draw(g, user.getSick_no());
 		boolean flag = false; // 血を新しく生成するかどうか
 
 		LinkedList sprites = world.getSprites();
@@ -289,12 +192,12 @@ public class PlayScreen extends Screen {
 				Ke ke = (Ke) sprite;
 				/********************************** ここから↓　switch分の方がよいかも...(12/12) **********************************/
 				// カミソリ処理
-				if (sick_no > 0) {
+				if (user.getSick_no() > 0) {
 					if (sick.isCollision(sprite) && !sick.isFlag_end()) { // カミソリに毛がぶつかり、カミソリが使えるのなら
-						if (sick_no != 0)
-							ke.minusHp(minuss[sick_no - 1]);
+						if (user.getSick_no() != 0)
+							ke.minusHp(sick.getDamage(user.getSick_no()));
 						if (!ke.isAbnum() && sprites.remove(ke)) {
-							shaved_sum++;
+							user.setSaved_sum(user.getShaved_sum() + 1);
 							sick.minusHp();
 							break;
 						}
@@ -302,7 +205,7 @@ public class PlayScreen extends Screen {
 				}
 
 				// 毛抜き処理
-				else if (sick_no == 0) {
+				else if (user.getSick_no() == 0) {
 					// 毛の選択処理
 					if (isBounds(down_Pos, (int) ke.x, (int) ke.y,
 							ke.getimage_width(), ke.getimage_height())
@@ -314,7 +217,7 @@ public class PlayScreen extends Screen {
 						// すね毛を抜く処理
 					} else if (flag_slide && ke.isFlag_select()) {
 						if (sprites.remove(ke)) {
-							shaved_sum++;
+							user.setSaved_sum(user.getShaved_sum() + 1);
 							flag_select = false;
 							break;
 						}
@@ -339,7 +242,7 @@ public class PlayScreen extends Screen {
 			sprite.draw(g);
 		}
 
-		if (flag_slide && sick_no > 0 && flag) { // 往復スライド時の出血
+		if (flag_slide && user.getSick_no() > 0 && flag) { // 往復スライド時の出血
 			world.addBlood(now_pos);
 			down_Pos = now_pos;
 		}
@@ -347,10 +250,11 @@ public class PlayScreen extends Screen {
 		g.drawRect(440, 0, 40, 40, Color.RED, 150);
 		g.drawPixmap(Assets.bt_itemselect, 0, 0);
 		// g.drawTextAlp("すね毛ポイント:", 210, 30, Color.BLACK, 30);
-		// g.drawTextAlp("" + shaved_sum, 400, 70, Color.BLACK, 50);
+		// g.drawTextAlp("" + user.getShaved_sum(), 400, 70, Color.BLACK, 50);
 		g.drawTextAlp("すね毛ポイント:", 210, 25, Color.BLACK, 20);
-		g.drawTextAlp("" + shaved_sum, 360, 25, Color.BLACK, 20);
-		g.drawTextAlp("sick_no" + sick_no, 300, 50, Color.BLACK, 20);
+		g.drawTextAlp("" + user.getShaved_sum(), 360, 25, Color.BLACK, 20);
+		g.drawTextAlp("user.getSick_no()" + user.getSick_no(), 300, 50,
+				Color.BLACK, 20);
 		g.drawTextAlp("now.x : " + now_pos.x + "  now.y : " + now_pos.y, 210,
 				70, Color.BLACK, 20);
 		g.drawTextAlp("pos.x : " + down_Pos.x + "  pos.y : " + down_Pos.y, 210,
@@ -361,20 +265,12 @@ public class PlayScreen extends Screen {
 		for (int i = 0; i < 5; i++) {
 			g.drawTextAlp((i + 1) + "枚刃", 10 + 80 * (i + 1), 730, Color.BLACK,
 					20);
-			g.drawTextAlp("" + hps[i], 10 + 80 * (i + 1), 780, Color.BLACK, 40);
+			g.drawTextAlp("" + user.getHp(i), 10 + 80 * (i + 1), 780,
+					Color.BLACK, 40);
 			g.drawLine(80 * (i + 1), 700, 80 * (i + 1), 800, Color.BLACK, 2);
 		}
 		g.drawTextAlp("毛抜き", 10, 730, Color.BLACK, 20);
-		g.drawRect((sick_no * 81) + 1, 701, 78, 100, Color.BLUE, 125);
-	}
-
-	private void drawGameOverUI() {
-		// ゲームオーバー時のUI(描画系)
-		Graphics g = game.getGraphics();
-		Paint paint = new Paint();
-		paint.setColor(Color.RED);
-		paint.setTextSize(100);
-		g.drawTextAlp("GameOver", 0, 300, paint);
+		g.drawRect((user.getSick_no() * 81) + 1, 701, 78, 100, Color.BLUE, 125);
 	}
 
 	// タップ時の当たり判定 目標がタップされた場合true、違う場合false
@@ -405,23 +301,8 @@ public class PlayScreen extends Screen {
 
 	@Override
 	public void dispose() {
-		Long time = System.currentTimeMillis();
-		Utils.addSaveData(game.getFileIO(), shaved_sum, 0, hps[0], hps[1],
-				hps[2], hps[3], hps[4], time);
-		LinkedList sprites = world.getSprites();
-		Iterator iterator = sprites.iterator();
-		int i = 0;
-		if (Utils.deleteSunegeRecode(game.getFileIO())) {
-			// // 毛の更新
-			while (iterator.hasNext()) {
-				i++;
-				Sprite sprite = (Sprite) iterator.next();
-				if (sprite instanceof Ke) {
-					Ke ke = (Ke) sprite;
-					Utils.addSunegeData(game.getFileIO(), (int) ke.x,
-							(int) ke.y, ke.level, ke.type, time);
-				}
-			}
-		}
+		user.DataSave(game);
+		world.DataSave(game);
 	}
+
 }

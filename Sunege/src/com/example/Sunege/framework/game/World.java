@@ -1,11 +1,13 @@
 package com.example.Sunege.framework.game;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import android.graphics.Color;
 import android.graphics.Point;
 import android.util.Log;
 
+import com.example.Sunege.framework.Game;
 import com.example.Sunege.framework.Graphics;
 
 public class World {
@@ -71,5 +73,24 @@ public class World {
 
 	public LinkedList getSprites() {
 		return sprites;
+	}
+
+	public void DataSave(Game game) {
+		Long time = System.currentTimeMillis();
+		LinkedList sprites = getSprites();
+		Iterator iterator = sprites.iterator();
+		int i = 0;
+		if (Utils.deleteSunegeRecode(game.getFileIO())) {
+			// // 毛の更新
+			while (iterator.hasNext()) {
+				i++;
+				Sprite sprite = (Sprite) iterator.next();
+				if (sprite instanceof Ke) {
+					Ke ke = (Ke) sprite;
+					Utils.addSunegeData(game.getFileIO(), (int) ke.x,
+							(int) ke.y, ke.level, ke.type, time);
+				}
+			}
+		}
 	}
 }
