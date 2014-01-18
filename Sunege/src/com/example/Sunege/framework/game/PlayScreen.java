@@ -22,7 +22,7 @@ import com.example.Sunege.framework.Screen;
 import com.example.Sunege.framework.Input.TouchEvent;
 
 public class PlayScreen extends Screen {
-	
+
 	private World world;
 	private Sickhydro sick;
 	private User user;
@@ -31,6 +31,7 @@ public class PlayScreen extends Screen {
 	private boolean flag_slide = false; // 横スライド、つまりスネをカミソリで切った場合
 	private boolean flag_select; // 1本でも毛を選択している状態ならtrue
 	private boolean flag_bloodedit = false; // 血を編集しているかどうか
+	private boolean flag_GameEnd = true; // true = ゲーム終了
 
 	public PlayScreen(Game game) {
 		super(game);
@@ -125,9 +126,10 @@ public class PlayScreen extends Screen {
 				}
 
 			case MotionEvent.ACTION_UP:
-				if (isBounds(event, 0, 0, 200, 100))
+				if (isBounds(event, 0, 0, 200, 100)) {
+					flag_GameEnd = false;
 					game.setScreen(new ItemSelectScreen(game, world, user));
-				else if (isBounds(event, 440, 0, 40, 40))
+				} else if (isBounds(event, 440, 0, 40, 40))
 					world.load();
 				else if (isBounds(event, 0, 700, 480, 100)) {
 					if (isBounds(event, 0, 700, 80, 100))
@@ -301,8 +303,10 @@ public class PlayScreen extends Screen {
 
 	@Override
 	public void dispose() {
-		user.DataSave(game);
-		world.DataSave(game);
+		if (flag_GameEnd) {
+			user.DataSave(game);
+			world.DataSave(game);
+		}
 	}
 
 }

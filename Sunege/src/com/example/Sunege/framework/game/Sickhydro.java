@@ -14,7 +14,7 @@ public class Sickhydro extends Sprite {
 	private boolean flag_draw = false; // 画像を描画するかのフラグ
 	private boolean flag_end = false;
 	private int hp;
-	private final int[] DAMEGES = { 1, 5, 10, 15, 30 }; // 剃れる度合い
+	private final int[] DAMEGES = { 2, 5, 10, 15, 30 }; // 剃れる度合い
 
 	public Sickhydro(int hp) {
 		this.x = -1;

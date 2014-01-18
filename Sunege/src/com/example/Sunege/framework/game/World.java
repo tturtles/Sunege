@@ -44,8 +44,7 @@ public class World {
 	}
 
 	public void addSunege(int dif) {
-		dif = dif > 150 ? 150 : dif;
-		for (int i = 1; true; i++) {
+		for (int i = 1; true&&i<150; i++) {
 			int w_dif = dif;
 			w_dif -= TICK_INITIAL * i;
 			if (w_dif < 0)
