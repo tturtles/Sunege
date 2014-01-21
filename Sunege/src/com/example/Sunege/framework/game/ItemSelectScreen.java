@@ -98,10 +98,16 @@ public class ItemSelectScreen extends Screen {
 		Graphics g = game.getGraphics();
 		g.drawRect(0, 0, 481, 801, Color.BLACK);
 		g.drawTextAlp("ItemSelectScreen", 50, 100, Color.RED, 50);
-		for (int i = 0; i < 5; i++) {
-			g.drawRect(0, (i * 100) + 170, 480, 100, Color.RED);
-			g.drawTextAlp("" + (i + 1), 230, (i * 100) + 230, Color.WHITE, 40);
-		}
+//		for (int i = 0; i < 5; i++) {
+//			g.drawRect(0, (i * 100) + 170, 480, 100, Color.RED);
+//			g.drawTextAlp("" + (i + 1), 230, (i * 100) + 230, Color.WHITE, 40);
+//		}
+		g.drawPixmap(Assets.image_sick01_button, 0, 170);
+		g.drawPixmap(Assets.image_sick02_button, 0, 270);
+		g.drawPixmap(Assets.image_sick03_button, 0, 370);
+		g.drawPixmap(Assets.image_sick04_button, 0, 470);
+		g.drawPixmap(Assets.image_sick05_button, 0, 570);
+		
 		g.drawRect(0, 750, 480, 800, Color.WHITE, 255);
 
 		// 「購入できない」というポップがあるとき

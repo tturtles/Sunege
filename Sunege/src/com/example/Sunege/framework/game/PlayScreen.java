@@ -264,15 +264,21 @@ public class PlayScreen extends Screen {
 		g.drawTextAlp("flag_bloodedit : " + flag_bloodedit, 210, 110,
 				Color.BLACK, 20);
 		g.drawLine(0, 700, 480, 700, Color.BLACK, 2);
+		g.drawPixmap(Assets.image_item00_button, 0, 700);
+		g.drawPixmap(Assets.image_item01_button, 80, 700);
+		g.drawPixmap(Assets.image_item02_button, 160, 700);
+		g.drawPixmap(Assets.image_item03_button, 240, 700);
+		g.drawPixmap(Assets.image_item04_button, 320, 700);
+		g.drawPixmap(Assets.image_item05_button, 400, 700);
+		g.drawTextAlp("毛抜き", 10, 730, Color.BLACK, 20);
+//		g.drawRect((user.getSick_no() * 81) + 1, 701, 78, 100, Color.BLUE, 125);
 		for (int i = 0; i < 5; i++) {
 			g.drawTextAlp((i + 1) + "枚刃", 10 + 80 * (i + 1), 730, Color.BLACK,
 					20);
 			g.drawTextAlp("" + user.getHp(i), 10 + 80 * (i + 1), 780,
 					Color.BLACK, 40);
-			g.drawLine(80 * (i + 1), 700, 80 * (i + 1), 800, Color.BLACK, 2);
+//			g.drawLine(80 * (i + 1), 700, 80 * (i + 1), 800, Color.BLACK, 2);
 		}
-		g.drawTextAlp("毛抜き", 10, 730, Color.BLACK, 20);
-		g.drawRect((user.getSick_no() * 81) + 1, 701, 78, 100, Color.BLUE, 125);
 	}
 
 	// タップ時の当たり判定 目標がタップされた場合true、違う場合false
