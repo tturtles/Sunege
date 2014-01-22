@@ -125,8 +125,8 @@ public class ItemSelectScreen extends Screen {
 			g.drawTextAlp("購入しますか？", 70, 320, Color.BLACK, 30);
 			g.drawTextAlp("はい", 80, 420, Color.BLACK, 30);
 			g.drawTextAlp("いいえ", 320, 420, Color.BLACK, 30);
-			g.drawRect(60, 370, 100, 80, Color.BLUE, 125);
-			g.drawRect(300, 370, 130, 80, Color.BLUE, 125);
+//			g.drawRect(60, 370, 100, 80, Color.BLUE, 125);
+//			g.drawRect(300, 370, 130, 80, Color.BLUE, 125);
 		}
 	}
 

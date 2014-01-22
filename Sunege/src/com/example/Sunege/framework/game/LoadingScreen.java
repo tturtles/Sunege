@@ -24,6 +24,7 @@ public class LoadingScreen extends Screen {
 		Assets.image_item03_button = g.newPixmap("image_item03_button.png", PixmapFormat.ARGB4444);
 		Assets.image_item04_button = g.newPixmap("image_item04_button.png", PixmapFormat.ARGB4444);
 		Assets.image_item05_button = g.newPixmap("image_item05_button.png", PixmapFormat.ARGB4444);
+		Assets.image_item06_button = g.newPixmap("image_item06_button.png", PixmapFormat.ARGB4444);
 		
 		Assets.image_sick01_button = g.newPixmap("image_sick01_button.png", PixmapFormat.ARGB4444);
 		Assets.image_sick02_button = g.newPixmap("image_sick02_button.png", PixmapFormat.ARGB4444);

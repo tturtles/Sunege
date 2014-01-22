@@ -15,6 +15,7 @@ public class Assets {
 	public static Pixmap image_item03_button;
 	public static Pixmap image_item04_button;
 	public static Pixmap image_item05_button;
+	public static Pixmap image_item06_button;
 	
 	public static Pixmap image_sick01_button;
 	public static Pixmap image_sick02_button;

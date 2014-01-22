@@ -270,14 +270,14 @@ public class PlayScreen extends Screen {
 		g.drawPixmap(Assets.image_item03_button, 240, 700);
 		g.drawPixmap(Assets.image_item04_button, 320, 700);
 		g.drawPixmap(Assets.image_item05_button, 400, 700);
-		g.drawTextAlp("毛抜き", 10, 730, Color.BLACK, 20);
-//		g.drawRect((user.getSick_no() * 81) + 1, 701, 78, 100, Color.BLUE, 125);
+		g.drawPixmap(Assets.image_item06_button, user.getSick_no() * 80,
+				700);
+		int color = user.getSick_no() == 0 ? Color.WHITE : Color.BLACK;
+		g.drawTextAlp("毛抜き", 10, 730, color, 20);
 		for (int i = 0; i < 5; i++) {
-			g.drawTextAlp((i + 1) + "枚刃", 10 + 80 * (i + 1), 730, Color.BLACK,
-					20);
-			g.drawTextAlp("" + user.getHp(i), 10 + 80 * (i + 1), 780,
-					Color.BLACK, 40);
-//			g.drawLine(80 * (i + 1), 700, 80 * (i + 1), 800, Color.BLACK, 2);
+			color = i == user.getSick_no() - 1 ? Color.WHITE : Color.BLACK;
+			g.drawTextAlp((i + 1) + "枚刃", 10 + 80 * (i + 1), 730, color, 20);
+			g.drawTextAlp("" + user.getHp(i), 10 + 80 * (i + 1), 780, color, 40);
 		}
 	}
 
