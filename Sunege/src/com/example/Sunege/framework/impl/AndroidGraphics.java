@@ -140,26 +140,13 @@ public class AndroidGraphics extends Activity implements Graphics {
 		canvas.drawBitmap(((AndroidPixmap) pixmap).bitmap, src, dst, paint);
 	}
 
-	public void drawPixmapTurn(Pixmap pixmap, Rect src, Rect dst,
-			float width_mag, float height_mag, int angle) {
+	public void drawPixmapTurn(Pixmap pixmap, Rect src, Rect dst, int angle) {
 		// 画像が回転するロジック
 		Matrix mtx = new Matrix();
 		mtx.postRotate(angle);
-//		mtx.postTranslate(dst.left, dst.top);
-		mtx.postTranslate(dst.width() / 2, dst.left);
-		mtx.postScale(width_mag, height_mag);
-		Bitmap bitmap = Bitmap.createBitmap(((AndroidPixmap) pixmap).bitmap, 0,
-				0, ((AndroidPixmap) pixmap).bitmap.getWidth(),
-				((AndroidPixmap) pixmap).bitmap.getHeight(), mtx, true);
-		canvas.drawBitmap(bitmap, dst.left, dst.top, null);
-	}
-
-	public void drawPixmapTurn(Pixmap pixmap, int x, int y, int angle) {
-		// 画像が回転するロジック
-		Matrix mtx = new Matrix();
-		mtx.postRotate(angle);
-		mtx.postTranslate(x, y);
+		mtx.postTranslate(dst.left, dst.top);
 		mtx.postTranslate(100 / 2, 150 / 2);
+
 		canvas.drawBitmap(((AndroidPixmap) pixmap).bitmap, mtx, null);
 	}
 
@@ -181,5 +168,5 @@ public class AndroidGraphics extends Activity implements Graphics {
 		paint.setTextSize(size);
 		canvas.drawText(line, x, y, paint);
 	}
-
+	
 }

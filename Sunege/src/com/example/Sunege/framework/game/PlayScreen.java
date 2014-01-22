@@ -32,6 +32,8 @@ public class PlayScreen extends Screen {
 	private boolean flag_select; // 1本でも毛を選択している状態ならtrue
 	private boolean flag_bloodedit = false; // 血を編集しているかどうか
 	private boolean flag_GameEnd = true; // true = ゲーム終了
+	private float tick = 0;
+	private final float INTERVAL_BOUNESSCREEN = 5.0f;	// BonusScreenを表示している時間
 
 	public PlayScreen(Game game) {
 		super(game);
@@ -158,6 +160,11 @@ public class PlayScreen extends Screen {
 				break;
 			}
 		}
+
+		// 各種更新
+		boolean[] flags = user.getFlags();
+		if (flags[0])
+			world.setReckless();
 		world.update(deltaTime);
 		// 毛の更新
 		LinkedList sprites = world.getSprites();
@@ -167,6 +174,8 @@ public class PlayScreen extends Screen {
 			if (sprite instanceof Ke) {
 				Ke ke = (Ke) sprite;
 				ke.Update(deltaTime);
+				if (flags[0])
+					ke.setReckless();
 				// ke.setAngle(now_pos);
 			} else if (sprite instanceof Blood) {
 				Blood blood = (Blood) sprite;
@@ -175,8 +184,6 @@ public class PlayScreen extends Screen {
 			sprite.Update();
 		}
 		sick.Update();
-		if (user.getSick_no() > 0)
-			user.setHp(user.getSick_no() - 1, sick.getHp());
 	}
 
 	@Override
@@ -200,6 +207,9 @@ public class PlayScreen extends Screen {
 							ke.minusHp(sick.getDamage(user.getSick_no()));
 						if (!ke.isAbnum() && sprites.remove(ke)) {
 							user.setSaved_sum(user.getShaved_sum() + 1);
+							user.setHp(user.getSick_no() - 1,
+									user.getHp(user.getSick_no() - 1) - 1);
+							user.setTotal(user.getTotal() + 1);
 							sick.minusHp();
 							break;
 						}
@@ -220,6 +230,7 @@ public class PlayScreen extends Screen {
 					} else if (flag_slide && ke.isFlag_select()) {
 						if (sprites.remove(ke)) {
 							user.setSaved_sum(user.getShaved_sum() + 1);
+							user.setTotal(user.getTotal() + 1);
 							flag_select = false;
 							break;
 						}
@@ -263,15 +274,13 @@ public class PlayScreen extends Screen {
 				90, Color.BLACK, 20);
 		g.drawTextAlp("flag_bloodedit : " + flag_bloodedit, 210, 110,
 				Color.BLACK, 20);
-		g.drawLine(0, 700, 480, 700, Color.BLACK, 2);
 		g.drawPixmap(Assets.image_item00_button, 0, 700);
 		g.drawPixmap(Assets.image_item01_button, 80, 700);
 		g.drawPixmap(Assets.image_item02_button, 160, 700);
 		g.drawPixmap(Assets.image_item03_button, 240, 700);
 		g.drawPixmap(Assets.image_item04_button, 320, 700);
 		g.drawPixmap(Assets.image_item05_button, 400, 700);
-		g.drawPixmap(Assets.image_item06_button, user.getSick_no() * 80,
-				700);
+		g.drawPixmap(Assets.image_item06_button, user.getSick_no() * 80, 700);
 		int color = user.getSick_no() == 0 ? Color.WHITE : Color.BLACK;
 		g.drawTextAlp("毛抜き", 10, 730, color, 20);
 		for (int i = 0; i < 5; i++) {
@@ -279,8 +288,25 @@ public class PlayScreen extends Screen {
 			g.drawTextAlp((i + 1) + "枚刃", 10 + 80 * (i + 1), 730, color, 20);
 			g.drawTextAlp("" + user.getHp(i), 10 + 80 * (i + 1), 780, color, 40);
 		}
+		if(user.getFlags()[0]) {
+			BonusScreen(deltaTime);
+		}
 	}
-
+	
+	private void BonusScreen(float deltaTime) {
+		tick += deltaTime;
+		if(tick>=INTERVAL_BOUNESSCREEN) return;
+		Graphics g = game.getGraphics();
+		g.drawRect(30, 30, 420, 740, Color.WHITE);
+		g.drawTextAlp("おめでとう", 60, 100, Color.RED, 50);
+		g.drawTextAlp("ございます！", 100, 170, Color.RED, 50);
+		g.drawTextAlp("「すね毛の暴走モード」", 30, 300, Color.BLACK, 40);
+		g.drawTextAlp("を開放しました", 100, 350, Color.BLACK, 40);
+		g.drawTextAlp("今後すね毛の成長が", 50, 500, Color.BLACK, 40);
+		g.drawTextAlp("速くなります", 50, 540, Color.BLACK, 40);
+		
+	}
+	
 	// タップ時の当たり判定 目標がタップされた場合true、違う場合false
 	private boolean isBounds(TouchEvent event, int x, int y, int width,
 			int height) {

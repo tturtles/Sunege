@@ -11,8 +11,8 @@ import com.example.Sunege.framework.Game;
 import com.example.Sunege.framework.Graphics;
 
 public class World {
-
 	private static final float TICK_INITIAL = 60.0f;
+	private static final float TICK_INITIAL_RECKLESS = 2.0f;
 	private static float tick = TICK_INITIAL; // 更新速度
 	private float tickTime;
 	private static LinkedList sprites;
@@ -44,7 +44,7 @@ public class World {
 	}
 
 	public void addSunege(int dif) {
-		for (int i = 1; true&&i<150; i++) {
+		for (int i = 1; true && i < 150; i++) {
 			int w_dif = dif;
 			w_dif -= TICK_INITIAL * i;
 			if (w_dif < 0)
@@ -91,5 +91,9 @@ public class World {
 				}
 			}
 		}
+	}
+	
+	public void setReckless() {
+		tick = TICK_INITIAL_RECKLESS;
 	}
 }

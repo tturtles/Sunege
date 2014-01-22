@@ -29,7 +29,8 @@ public class Utils {
 					+ "sum integer default 0," + "loves integer default 0,"
 					+ "sick1 integer default 0," + "sick2 integer default 0,"
 					+ "sick3 integer default 0," + "sick4 integer default 0,"
-					+ "sick5 integer default 0," + "times long)";
+					+ "sick5 integer default 0," + "times long,"
+					+ "total integer default 0)";
 
 			sql[1] = "create table SunegeData("
 					+ "_id integer primary key autoincrement,"
@@ -39,7 +40,7 @@ public class Utils {
 
 			if (files.CreateDBandTable(sql))
 				addSaveData(files, 0, 0, 0, 0, 0, 0, 0,
-						System.currentTimeMillis());
+						System.currentTimeMillis(), 0);
 		} catch (Exception e) {
 			// デフォルト設定があるのでエラーは無視
 		} finally {
@@ -52,7 +53,8 @@ public class Utils {
 	}
 
 	public static boolean addSaveData(FileIO files, int sum, int loves,
-			int sick1, int sick2, int sick3, int sick4, int sick5, long times) {
+			int sick1, int sick2, int sick3, int sick4, int sick5, long times,
+			int total) {
 		ContentValues val = new ContentValues();
 		val.put("sum", sum);
 		val.put("loves", loves);
@@ -62,6 +64,7 @@ public class Utils {
 		val.put("sick4", sick4);
 		val.put("sick5", sick5);
 		val.put("times", times);
+		val.put("total", total);
 		return files.writeFile("SaveData", val);
 	}
 
@@ -78,7 +81,7 @@ public class Utils {
 
 	public static String[][] readSaveData(FileIO files) {
 		String[] columns = { "sum", "loves", "sick1", "sick2", "sick3",
-				"sick4", "sick5", "times" };
+				"sick4", "sick5", "times", "total" };
 		String order = "times desc";
 		// String order = null;
 		return files.readFile("SaveData", columns, null, null, order, 1);

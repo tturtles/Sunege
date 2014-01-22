@@ -30,13 +30,6 @@ public interface Graphics {
 
 	public void drawPixmap(Pixmap pixmap, Rect src, Rect dst);
 
-	public void drawPixmap(Pixmap pixmap, Rect src, Rect dst, int alpha);
-
-	public void drawPixmapTurn(Pixmap pixmap, Rect src, Rect dst,
-			float width_mag, float height_mag, int angle);
-
-	public void drawPixmapTurn(Pixmap pixmap, int x, int y, int angle);
-
 	public int getWidth();
 
 	public int getHeight();
@@ -45,4 +38,7 @@ public interface Graphics {
 
 	public void drawTextAlp(String line, float x, float y, int color, float size);
 
+	public void drawPixmapTurn(Pixmap pixmap, Rect src, Rect dst, int angle);
+	
+	public void drawPixmap(Pixmap pixmap, Rect src, Rect dst, int alpha);
 }

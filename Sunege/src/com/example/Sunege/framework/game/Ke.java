@@ -10,8 +10,8 @@ import android.util.Log;
 import com.example.Sunege.framework.Graphics;
 
 public class Ke extends Sprite {
-
 	public static final float TICK_INITIAL = 10.0f; // すね毛が伸びる速度
+	public static final float TICK_INITIAL_RECKLESS = 0.5f; // すね毛が伸びる速度
 	private static float tick = TICK_INITIAL; // 更新速度
 	private float tickTime;
 	private static int ADD_LEVEL = 10;
@@ -26,7 +26,7 @@ public class Ke extends Sprite {
 	private int move_y = 0;
 	protected int angle = 0;
 	private int hp = 30;
-
+	
 	public Ke() {
 		this.image = Assets.image_ke;
 		image_width = 24;
@@ -64,16 +64,16 @@ public class Ke extends Sprite {
 		}
 		this.x += move_x;
 		this.y += move_y;
-		// angle = angle > 360 ? 0 : angle + 5;
+		 angle = angle > 360 ? 0 : angle + 5;
 	}
 
 	public void draw(Graphics g) {
 		Rect src = new Rect(0, 0, image_width, image_height);
 		Rect dst = new Rect((int) x, (int) y, (int) x + image_width,
 				(int) (y + (image_height * (level * 0.01))));
-		// if (flag_select)
-		// g.drawPixmapTurn(Assets.imagel_ke, src, dst, 1, 1, angle);
-		// else
+//		 if (flag_select)
+//			 g.drawPixmap(Assets.image_ke, src, dst, angle);
+//		 else
 		g.drawPixmap(Assets.image_ke, src, dst);
 
 		// g.drawPixmapTurn(Assets.image_ke, src, dst, 1,
@@ -93,6 +93,7 @@ public class Ke extends Sprite {
 	public void setFlag_select(boolean flag_select) {
 		this.flag_select = flag_select;
 	}
+	
 
 	public int getimage_width() {
 		return image_width;
@@ -106,18 +107,18 @@ public class Ke extends Sprite {
 		return flag_select;
 	}
 
-	public void setAngle(Point now_point) {
-		if (!flag_select)
-			return;
-		int r = 10;
-		float center_x = (float) (x + image_width / 2);
-		x += center_x;
-		// float center_y = (float)(y+image_height/2);
-		double degree = Math.cos(Math.PI * r) / 180 * now_point.x;
-		angle = (int) degree;
-	}
+//	public void setAngle(Point now_point) {
+//		if (!flag_select)
+//			return;
+//		int r = 10;
+//		float center_x = (float) (x + image_width / 2);
+//		x += center_x;
+//		// float center_y = (float)(y+image_height/2);
+//		double degree = Math.cos(Math.PI * r) / 180 * now_point.x;
+//		angle = (int) degree;
+//	}
 
-	public boolean isAbnum() {
+	public boolean isAbnum() {	// 存在しているかどうか
 		return hp > 0 ? true : false;
 	}
 
@@ -125,4 +126,7 @@ public class Ke extends Sprite {
 		hp -= minus;
 	}
 
+	public void setReckless() {
+		tick = TICK_INITIAL_RECKLESS;
+	}
 }
