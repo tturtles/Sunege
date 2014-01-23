@@ -12,7 +12,7 @@ import com.example.Sunege.framework.Graphics;
 
 public class World {
 	private static final float TICK_INITIAL = 60.0f;
-	private static final float TICK_INITIAL_RECKLESS = 2.0f;
+	private static final float TICK_INITIAL_RECKLESS = 0.5f;
 	private static float tick = TICK_INITIAL; // 更新速度
 	private float tickTime;
 	private static LinkedList sprites;
@@ -92,7 +92,7 @@ public class World {
 			}
 		}
 	}
-	
+
 	public void setReckless() {
 		tick = TICK_INITIAL_RECKLESS;
 	}

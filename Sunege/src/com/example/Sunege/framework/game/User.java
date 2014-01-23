@@ -23,7 +23,7 @@ public class User {
 		hps = new int[5];
 		String[][] list = Utils.readSaveData(game.getFileIO());
 		sunegePoint = Integer.parseInt(list[0][0]); // 剃ったすね毛の総数取得
-		sunegePoint = 1000000; // 剃ったすね毛の総数取得
+//		sunegePoint = 1000000; // 剃ったすね毛の総数取得
 		total = Integer.parseInt(list[0][8]);
 		for (int i = 0; i < flags.length; i++)
 			flags[i] = bounders[i] < total ? true : false;
