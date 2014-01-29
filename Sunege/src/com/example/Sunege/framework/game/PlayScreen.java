@@ -260,20 +260,20 @@ public class PlayScreen extends Screen {
 			down_Pos = now_pos;
 		}
 
-		g.drawRect(440, 0, 40, 40, Color.RED, 150);
+//		g.drawRect(440, 0, 40, 40, Color.RED, 150);
 		g.drawPixmap(Assets.bt_itemselect, 0, 0);
-		// g.drawTextAlp("すね毛ポイント:", 210, 30, Color.BLACK, 30);
-		// g.drawTextAlp("" + user.getShaved_sum(), 400, 70, Color.BLACK, 50);
-		g.drawTextAlp("すね毛ポイント:", 210, 25, Color.BLACK, 20);
-		g.drawTextAlp("" + user.getShaved_sum(), 360, 25, Color.BLACK, 20);
-		g.drawTextAlp("user.getSick_no()" + user.getSick_no(), 300, 50,
-				Color.BLACK, 20);
-		g.drawTextAlp("now.x : " + now_pos.x + "  now.y : " + now_pos.y, 210,
-				70, Color.BLACK, 20);
-		g.drawTextAlp("pos.x : " + down_Pos.x + "  pos.y : " + down_Pos.y, 210,
-				90, Color.BLACK, 20);
-		g.drawTextAlp("flag_bloodedit : " + flag_bloodedit, 210, 110,
-				Color.BLACK, 20);
+		 g.drawTextAlp("すね毛ポイント:", 210, 30, Color.BLACK, 30);
+		 g.drawTextAlp("" + user.getShaved_sum(), 400, 70, Color.BLACK, 50);
+//		g.drawTextAlp("すね毛ポイント:", 210, 25, Color.BLACK, 20);
+//		g.drawTextAlp("" + user.getShaved_sum(), 360, 25, Color.BLACK, 20);
+//		g.drawTextAlp("user.getSick_no()" + user.getSick_no(), 300, 50,
+//				Color.BLACK, 20);
+//		g.drawTextAlp("now.x : " + now_pos.x + "  now.y : " + now_pos.y, 210,
+//				70, Color.BLACK, 20);
+//		g.drawTextAlp("pos.x : " + down_Pos.x + "  pos.y : " + down_Pos.y, 210,
+//				90, Color.BLACK, 20);
+//		g.drawTextAlp("flag_bloodedit : " + flag_bloodedit, 210, 110,
+//				Color.BLACK, 20);
 		g.drawPixmap(Assets.image_item00_button, 0, 700);
 		g.drawPixmap(Assets.image_item01_button, 80, 700);
 		g.drawPixmap(Assets.image_item02_button, 160, 700);

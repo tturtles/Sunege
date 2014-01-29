@@ -37,8 +37,8 @@ public class Sickhydro extends Sprite {
 		if (flag_draw && !flag_end) {
 			g.drawRect((int) x, (int) y, width, height, Color.BLACK);
 		}
-		g.drawTextAlp("hp : " + (sick_no > 0 ? Integer.toString(hp) : "∞"),
-				210, 50, Color.BLACK, 20);
+//		g.drawTextAlp("hp : " + (sick_no > 0 ? Integer.toString(hp) : "∞"),
+//				210, 50, Color.BLACK, 20);
 	}
 
 	// seter,geter
